@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="Scripts_files" Directory="Scripts">
+      <Component Id="cmpB7s01QuGY0gHOdZwI72XY2M.AaA" Guid="*">
+        <File Id="filcQvfzxD1qe6wbBzhyVl71bkKg28" Source="$(var.BackupMemoryTest.TargetDir)\BackupMemoryTest.dll" />
+      </Component>
+      <Component Id="cmpCEyWq1.NC806SmvaGRSHNbSiOs8" Guid="*">
+        <File Id="fileWpxZl6tAh6j.QduMnBu7ElsVXk" Source="$(var.CANTest.TargetDir)\CANConnectorTest.dll" />
+      </Component>
+      <Component Id="cmpj6GVbNsapr_JLY8q50C6cnLh9E8" Guid="*">
+        <File Id="filPjLyPAHcGsBoLLMWB1QEcJCK9lU" Source="$(var.DigitalIOTest.TargetDir)\DigitalIOTest.dll" />
+      </Component>
+      <Component Id="cmpazgEjhnUcMEUhvf9ngrtBIanvpc" Guid="*">
+        <File Id="filK6t.ghNPqldnCPYAT2VH6riz8iU" Source="$(var.FANTest.TargetDir)\FANTest.dll" />
+      </Component>
+      <Component Id="cmp5EFgTXqWgU.k7LZrzjBWjrj_NTY" Guid="*">
+        <File Id="filhbiojX2qrWqdKwXjgQ76tdQOnyY" Source="$(var.LEDBarTest.TargetDir)\LEDBarTest.dll" />
+      </Component>
+      <Component Id="cmp4q32txvxByT3Ho3KNHCyWlpJgu8" Guid="*">
+        <File Id="fileoJA.7xO3m0t_5gOagOBNz_oi2o" Source="$(var.ServiceLevelTest.TargetDir)\ServiceLevelTest.dll" />
+      </Component>
+      <Component Id="cmpfptb3nbtDY0rtiWrZDtRG2ME6gY" Guid="*">
+        <File Id="fil5u1J2nOUMFmDbE8L.0htmRP3zPo" Source="$(var.USBHubTest.TargetDir)\USBHubTest.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Scripts.Content" />
+  </Fragment>
+</Wix>

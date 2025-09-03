@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BackupMemoryTest">
+      <HintPath>..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\BackupMemoryTest.dll</HintPath>
+    </Reference>
+    <Reference Include="CANConnectorTest">
+      <HintPath>..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\CANConnectorTest.dll</HintPath>
+    </Reference>
+    <Reference Include="ConnectionTester">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Connections\ConnectionTester.dll</HintPath>
+    </Reference>
+    <Reference Include="DigitalIOTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\DigitalIOTest.dll</HintPath>
+    </Reference>
+    <Reference Include="FANTest">
+      <HintPath>..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\FANTest.dll</HintPath>
+    </Reference>
+    <Reference Include="HardwareParameterHandler">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Connections\HardwareParameterHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="LEDBarTest">
+      <HintPath>..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\LEDBarTest.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceLevelTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\ServiceLevelTest.dll</HintPath>
+    </Reference>
+    <Reference Include="USBHubTest">
+      <HintPath>..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\USBHubTest.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CopyFilesFromTxtToTemp.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

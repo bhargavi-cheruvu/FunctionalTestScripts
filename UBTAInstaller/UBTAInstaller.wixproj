@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk/4.0.3">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="$(SolutionDir)\UBTAGenerateInstaller\bin\Debug\net6.0\UBTAGenerateInstaller.exe $(ProjectDir)" />
+  </Target>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="4.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Connections\ConnectionTester\ConnectionTester.csproj" />
+    <ProjectReference Include="..\Connections\HardwareParameterHandler\HardwareParameterHandler.csproj" />
+    <ProjectReference Include="..\Scripts\BackupMemoryTest\BackupMemoryTest.csproj" />
+    <ProjectReference Include="..\Scripts\CANTest\CANTest.csproj" />
+    <ProjectReference Include="..\Scripts\DigitalIOTest\DigitalIOTest.csproj" />
+    <ProjectReference Include="..\Scripts\FANTest\FANTest.csproj" />
+    <ProjectReference Include="..\Scripts\LEDBarTest\LEDBarTest.csproj" />
+    <ProjectReference Include="..\Scripts\ServiceLevelTest\ServiceLevelTest.csproj" />
+    <ProjectReference Include="..\Scripts\USBHubTest\USBHubTest.csproj" />
+    <ProjectReference Include="..\UBTAGenerateInstaller\UBTAGenerateInstaller.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <ProjectDirectoryName>$(SolutionDir)UBTAInstaller</ProjectDirectoryName>
+    <EnableProjectHarvesting>true</EnableProjectHarvesting>
+    <PostBuildEvent>powershell -ExecutionPolicy Bypass -File $(SolutionDir)UBTAGenerateInstaller\CopyFilesFromTxtToTemp.ps1 -DestPath $(ProjectDirectoryName)</PostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+</Project>

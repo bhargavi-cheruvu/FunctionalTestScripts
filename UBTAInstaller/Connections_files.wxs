@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="Connections_files" Directory="Connections">
+      <Component Id="cmpKFrSdIcuFfVSGvY5t8zNi5vyytQ" Guid="*">
+        <File Id="fil0WymtaT2AxHVAyqKaHa0w6Y.NrI" Source="$(var.ConnectionTester.TargetDir)\ConnectionTester.dll" />
+      </Component>
+      <Component Id="cmpZUo9Wz1kL64BWRv7e_fh9iUO3Ts" Guid="*">
+        <File Id="filZ8XgL7coGlLAG7gPLSYhNaRIM0g" Source="$(var.HardwareParameterHandler.TargetDir)\HardwareParameterHandler.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Connections.Content" />
+  </Fragment>
+</Wix>

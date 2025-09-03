@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="Configuration_files" Directory="ConfigFolder">
+      <Component>
+        <File Source="$(SolutionDir)\UniversalBoardTestConfig.xml" Name="UniversalBoardTestConfig.xml" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

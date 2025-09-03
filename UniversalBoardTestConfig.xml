@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Main Node-->
+<FunctionalTests>
+	<!-- Sub Node - Appears at top of GUI - Attributes: Name (string)-->
+	<FunctionalTest Name="Functional Test Suite">
+		<!-- App Configuration Node: Basic Settings, Possible Sub Nodes: SerialNumberSettings, MonitorSettings, ResultSettings-->
+		<AppConfiguration>
+			<!-- SerialNumberSettings Node: Controls behaviour of SerialNumber Input -->
+			<!-- Attributes: DeviceUnderTest (string), ReadOnly (bool), ScanButtonEnabled (bool), RevisionEnabled (bool), SerialNumberHardwareParameter (string), RevisionHardwareParameter (string), ScanButtonHardwareParameter (string) -->
+			<SerialNumberSettings DeviceUnderTest="Example" ReadOnly="true" ScanButtonEnabled="false" RevisionEnabled="false" SerialNumberHardwareParameter="SerialNumber"/>
+			<!-- MonitorSettings Node: Controls behaviour of Monitor Tab Page -->
+			<!-- Attributes: UpdateIntervalInMs (UInt64) -->
+			<MonitorSettings />
+			<!-- ResultSettings Node: Enables result transfers to database and protocol -->
+			<!-- Attributes: DatabaseEnabled (bool), TestReportEnabeld (bool) -->
+			<ResultSettings DatabaseEnabled="False" TestReportEnabled="False" />
+		</AppConfiguration>
+		<!-- DevicesUnderTest Node: Lists Devices Under Test Nodes, Sub Node: DeviceUnderTest -->
+		<DevicesUnderTest>
+			<!-- DeviceUnderTest Node: Information about the device, which is supposed to be tested -->
+			<!-- Attributes: Name (string), Partnumber (string), Description (string), Manufacturer (string) -->
+			<DeviceUnderTest Name="Example" Partnumber="Example Partnumber" Description="Example Description" Manufacturer="Example Manufacturer"/>
+		</DevicesUnderTest>
+		<!-- Connections Node: Lists Connections, Sub Node: Connection -->
+		<Connections>
+			<!-- Connection Node: Information about the connections, which are needed for the test (script allowed as *.cs and *.dll) -->
+			<!-- Attributes: Name (string), ConnectionType (string), Script (string) -->
+			<!--<Connection Name="Blank" ConnectionType="" Script="ConnectionExample.dll"/>-->
+			<Connection Name="Blank" ConnectionType="" Script="ConnectionTester.dll"/>
+		</Connections>
+		<!-- Tests Node: Lists Tests, Sub Node: Test -->
+		<Tests>
+			<!-- Test Node: Information about the tests, which are supposed to be performed (script allowed as *.cs and *.dll) -->
+			<!-- Attributes: Name (string), Script (string) -->
+			<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>
+			<Test Name="Digital Input/Output Test" Script="DigitalIOTest.dll"/>
+			<Test Name="FAN Test" Script="FANTest.dll"/>
+			<Test Name="USBHub Level Test" Script="USBHubTest.dll"/>
+			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
+			<Test Name="Key Pad / LEDs Test" Script="LEDBarTest.dll"/>
+			<Test Name="Backup Memory Status Test" Script="BackupMemoryTest.dll"/>
+			<Test Name="LeakSensor Test" Script="LeakSensorTest.dll"/>	
+		</Tests>
+		<!-- DebugParameters Node: Lists DebugParameter which are supposed to be controllable via Debug Tab Page, Sub Node: DebugParameter -->
+		<DebugParameters>
+			<!-- DebugParameter Node: Creates Control Item on Debug Tab Page in GUI -->
+			<!-- Attributes: Name (string), ControlType (string) ("State", "Switch", "Readback", "Slider", "Blank"), HardwareParameter (string),  Inverted (bool), Page (string) -->
+			
+			
+			<!--<DebugParameter Name="State"	ControlType="State"		HardwareParameter="StateExample"	Page="Blank"/>
+			<DebugParameter Name="Switch"	ControlType="Switch"	HardwareParameter="SwitchExample"	Page="Blank"/>
+			<DebugParameter Name="Slider"	ControlType="Slider"	HardwareParameter="SliderExample"	Page="Blank"/>
+			<DebugParameter Name="Readback" ControlType="Readback"	HardwareParameter="ReadbackExample" Page="Blank"/>-->
+			
+			
+
+			<!--<DebugParameter Name="Service.Challenge" ControlType="Readback"	HardwareParameter="Service.Challenge" Page="Blank"/>
+			<DebugParameter Name="Service.Code" ControlType="Readback"	HardwareParameter="Service.Code" Page="Blank"/>
+			
+			<DebugParameter Name="BackupMemory.Status" ControlType="Readback"	HardwareParameter="BackupMemory.Status" Page="Blank"/>
+
+			<DebugParameter Name="Initial.State" ControlType="Readback"	HardwareParameter="Initial.State" Page="Blank"/>
+			<DebugParameter Name="Relay1.State" ControlType="Readback"	HardwareParameter="Relay1.State" Page="Blank"/>
+			<DebugParameter Name="Relay2.State" ControlType="Readback"	HardwareParameter="Relay2.State" Page="Blank"/>
+			<DebugParameter Name="Relay3.State" ControlType="Readback"	HardwareParameter="Relay3.State" Page="Blank"/>
+			<DebugParameter Name="Relay4.State" ControlType="Readback"	HardwareParameter="Relay4.State" Page="Blank"/>-->
+			
+		</DebugParameters>
+		<!-- HardwareParameters Node: Lists HardwareParameter which are supposed to be controllable, Sub Nodes: HardwareParameter, ExternalHardwareParameterFile -->
+		<HardwareParameters>
+			<!-- HardwareParameter Node: Creates Parameter which will be controllable via test script or monitor tab -->
+			<!-- Attributes: Name (string), Address (Int64), Item (Int64), Mask (Int64), DeviceType (string), Channel (int), -->
+			<!-- Attributes: ConversionFormula (string), ConversionA (double), ConversionB (double), ConversionC (double), Offset (double), -->
+			<!-- Attributes: RangeMin (double), RangeMax (double), LowerLimit (double), UpperLimit (double) -->
+			<!-- Attributes: Connection (string), Unit (string), Value (double), Content (string) -->
+			
+			
+			<!--<HardwareParameter Name="StateExample"		RangeMin="0" RangeMax="1"	Unit="I/O"	Connection="Blank"/>
+			<HardwareParameter Name="SwitchExample"		RangeMin="0" RangeMax="1"	Unit="I/O"	Connection="Blank"/>
+			<HardwareParameter Name="SliderExample"		RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="ReadbackExample"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>-->
+			
+
+			<!--<HardwareParameter Name="Service.Challenge"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="Service.Code"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			
+			<HardwareParameter Name="BackupMemory.Status"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+
+			<HardwareParameter Name="Initial.State"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="Relay1.State"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="Relay2.State"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="Relay3.State"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>
+			<HardwareParameter Name="Relay4.State"	RangeMin="0" RangeMax="100" Unit="%"	Connection="Blank"/>-->
+			
+			
+			<HardwareParameter Name="SerialNumber"	Content="Relay Sample"	Connection="Blank"/>
+
+			<!-- ExternalHardwareParameterFile Node: Links GUI to external script, which includes Hardware Parameter (script allowed as *.cs and *.dll) -->
+			<!-- Attributes: Connection (string), Script (string), Path (string) (deprecated)-->
+			<ExternalHardwareParameterFile Connection="Blank" Script="HardwareParameterHandler.dll" Path="notneeded"/>
+		</HardwareParameters>
+	</FunctionalTest>
+</FunctionalTests>
