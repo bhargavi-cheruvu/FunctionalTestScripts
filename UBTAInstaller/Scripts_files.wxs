@@ -2,9 +2,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
     <ComponentGroup Id="Scripts_files" Directory="Scripts">
-      <Component Id="cmpB7s01QuGY0gHOdZwI72XY2M.AaA" Guid="*">
-        <File Id="filcQvfzxD1qe6wbBzhyVl71bkKg28" Source="$(var.BackupMemoryTest.TargetDir)\BackupMemoryTest.dll" />
-      </Component>
       <Component Id="cmpCEyWq1.NC806SmvaGRSHNbSiOs8" Guid="*">
         <File Id="fileWpxZl6tAh6j.QduMnBu7ElsVXk" Source="$(var.CANTest.TargetDir)\CANConnectorTest.dll" />
       </Component>

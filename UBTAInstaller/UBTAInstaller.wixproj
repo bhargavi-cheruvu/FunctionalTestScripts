@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Connections\ConnectionTester\ConnectionTester.csproj" />
     <ProjectReference Include="..\Connections\HardwareParameterHandler\HardwareParameterHandler.csproj" />
-    <ProjectReference Include="..\Scripts\BackupMemoryTest\BackupMemoryTest.csproj" />
     <ProjectReference Include="..\Scripts\CANTest\CANTest.csproj" />
     <ProjectReference Include="..\Scripts\DigitalIOTest\DigitalIOTest.csproj" />
     <ProjectReference Include="..\Scripts\FANTest\FANTest.csproj" />
