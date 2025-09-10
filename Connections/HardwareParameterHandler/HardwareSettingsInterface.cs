@@ -31,6 +31,8 @@ public class Parser
             // FAN
             Add(new HardwareParameter() { Name = BoardParameterName.Fan1Pwm, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.Fan2Pwm, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.Fan1Speed, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.Fan1Speed, DeviceType = "USB", ConversionFormula = "IsNeeded" });
 
             // Backup
             Add(new HardwareParameter() { Name = BoardParameterName.BackupMemory, DeviceType = "USB", ConversionFormula = "None" });
@@ -76,6 +78,8 @@ public class BoardParameterName
     // FAN
     public const string Fan1Pwm = "Fan1Pwm";
     public const string Fan2Pwm = "Fan2Pwm";
+    public const string Fan1Speed = "Fan1Speed";
+    public const string Fan2Speed = "Fan2Speed";
 
     // KeyPad
     public const string KeyPad = "Keys"; // need to check

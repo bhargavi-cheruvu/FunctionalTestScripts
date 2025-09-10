@@ -1,9 +1,10 @@
-﻿using LogViewManager;
+﻿using Helper;
+using LogViewManager;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters;
 using System.Threading;
 using UniversalBoardTestApp;
-using Helper;
-using System.Runtime.Serialization.Formatters;
 public class Test
 {
     // Version of the script. Gets displayed in database/protocol
@@ -62,6 +63,7 @@ public class Test
                 {
                     string key = token[0];
                     lockState = token[1];
+                    Logger.LogMessage(Level.Info, $"Response for Service.Lock is {lockState}");
                     break;
                 }
             }
@@ -85,8 +87,23 @@ public class Test
         {
             HardwareParameters.GetParameter(parameterName, out response);
             if (!string.IsNullOrEmpty(response))
-                return true;
+            {
+                // Parse and Validate for Service Challenge and Service code values.           
+                var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
+                foreach (string line in lines)
+                {
+                    var token = line.Split(Handler.DELIMITER);
+                    if (token.Length > 0 && token[0] == ServiceLevelParameterNames.ServiceChallange_Resp)
+                    {
+                        string key = token[0];
+                        response = token[1];
+                        Logger.LogMessage(Level.Info, $"Response for Service.Challenge is {token[1]}");
+                        break;
+                    }
+                }
+                return true;
+            }
             Thread.Sleep(interval);
             elapsed += interval;
         }
@@ -114,6 +131,7 @@ public class Test
                 {
                     string key = token[0];
                     response = token[1];
+                    Logger.LogMessage(Level.Info, $"Response for Service.Code is { token[1]}");
                     break;
                 }
             }
