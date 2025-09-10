@@ -22,12 +22,7 @@ public class Test
             return false;
 
         Logger.LogMessage(Level.Info, Handler.LEDBarTest);
-        ///trial
-        KeyPadForm frm = new KeyPadForm();
-        frm.ShowDialog();
-        ///
-
-      //////  SetLEDBarForeColor();       // uncomment this
+        SetLEDBarForeColor();
         return true;
     }
     private void SetLEDBarForeColor()
@@ -44,6 +39,7 @@ public class Test
             {
                 string key = token[Handler.INDEX_ZERO];
                 response = token[Handler.INDEX_ONE];
+                Logger.LogMessage(Level.Info, $"Response for LEDBar.ForceColor is {token[Handler.INDEX_ONE]}");
                 break;
             }
         }
@@ -128,7 +124,7 @@ public class Test
             foreach (string line in lines)
             {
                 var token = line.Split(Handler.DELIMITER);
-                if (token.Length > 0 && token[0] == Handler.LEDBAR_RESP_CMD)
+                if (token.Length > 0 && token[0] == Handler.LEDBAR_RESP_CMD && token[1] == result.ToString())
                 {
                     string key = token[0];
                     response = token[1];
@@ -137,7 +133,10 @@ public class Test
             }
 
             if (!string.IsNullOrEmpty(response) && response == expectedValue)
+            {
+                Logger.LogMessage(Level.Info, $"Response for LEDBar.ForceColor is {response}");
                 return true;
+            }
 
             Thread.Sleep(interval);
             elapsed += interval;

@@ -22,6 +22,7 @@ namespace Helper
     public class ServiceLevelParameterNames
     {
         public const string ServiceChallange = "Service.Challenge";        
+        public const string ServiceChallange_Resp = "~Service.Challenge";
         public const string ServiceCodeRequest = "Service.Code";
         public const string ValidateServiceCode = "~Service.Code";
         public const string NoResponseFromDevice = "No response from device for Service.Challenge.";
