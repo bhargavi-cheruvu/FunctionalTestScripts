@@ -27,7 +27,7 @@ public class Test
         string lockState = null;
         
         // Service challenge command        
-        HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceChallange, 0);
+        HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceChallange, ServiceLevelParameterNames.ServiceChallangeVal);
 
         // Wait for response ~Service.Challenge=<value>
         if (!WaitForResponse(ServiceLevelParameterNames.ServiceChallange, ServiceLevelParameterNames.TimeInterval, out string challengeValue))
@@ -35,8 +35,8 @@ public class Test
             Logger.LogMessage(Level.Error, ServiceLevelParameterNames.NoResponseFromDevice);
             return false;
         }
-        
-        // service code command
+
+        // service code command     
         HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceCodeRequest, ServiceLevelParameterNames.ServiceCode);
                
         // Wait for expected response: ~Service.Code=1
@@ -63,7 +63,7 @@ public class Test
                 {
                     string key = token[0];
                     lockState = token[1];
-                    Logger.LogMessage(Level.Info, $"Response for Service.Lock is {lockState}");
+                    Logger.LogMessage(Level.Info, $"Response for Service.Lock is {token[1]}");
                     break;
                 }
             }
@@ -115,7 +115,7 @@ public class Test
     private bool WaitForExpectedResponse(string parameterName, string expectedValue, int timeoutMs)
     {
         int elapsed = 0;
-        int interval = 300;
+        int interval = 100;
         string response;
 
         while (elapsed < timeoutMs)

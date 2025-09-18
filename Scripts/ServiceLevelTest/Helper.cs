@@ -34,9 +34,10 @@ namespace Helper
         public const string ServiceLock_Response = "~Service.Lock";
         public const string ServiceChallangeResponse = "Challenge received: Service.Challenge=";
         public const string UserMode = "Switched back to User Mode from ServiceLevel Mode";
-        public const string ServiceCode = "87794";
+        public const int ServiceChallangeVal = 0;
+        public const int ServiceCode = 87794;
         public const string ExpectedServiceCode = "1";
         public const string ServiceLockResult = "OK";
-        public const int TimeInterval = 3000; //1000;      
+        public const int TimeInterval = 1000;      
     }
 }
