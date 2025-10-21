@@ -15,8 +15,14 @@
     <Reference Include="CANConnectorTest">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\CANConnectorTest.dll</HintPath>
     </Reference>
+    <Reference Include="ComputeModuleTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\ComputeModuleTest.dll</HintPath>
+    </Reference>
     <Reference Include="ConnectionTester">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Connections\ConnectionTester.dll</HintPath>
+    </Reference>
+    <Reference Include="DegasserTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\DegasserTest.dll</HintPath>
     </Reference>
     <Reference Include="DigitalIOTest">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\DigitalIOTest.dll</HintPath>
@@ -26,6 +32,9 @@
     </Reference>
     <Reference Include="HardwareParameterHandler">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Connections\HardwareParameterHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="LeakSensorTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\LeakSensorTest.dll</HintPath>
     </Reference>
     <Reference Include="LEDBarTest">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\LEDBarTest.dll</HintPath>

@@ -33,6 +33,9 @@ namespace Helper
 
         public const string KEYPAD_CAPTION = "KeyPad";
         public const string MUTEALARM_RESP_CMD = "Keys";
+        public const string KEYS_RESP_CMD = "~Keys";
+
+        public const string KEYPAD_TESTMODE = "Key.TestMode";
     }
 
     public enum LEDSTATUSCOLOR

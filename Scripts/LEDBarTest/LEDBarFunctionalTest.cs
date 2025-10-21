@@ -16,6 +16,8 @@ public class Test
     private const string TestVersion = Handler.TEST_VERSION; // Version Number
     private int result = 1;
     private bool IsLEDBarMode = true;
+    private string responseVal = null;
+
     public bool Start()
     {
         if (ScriptHelper.CheckIfProcedureIsCancelled())
@@ -71,20 +73,29 @@ public class Test
             if (MessageBox.Show($"Complete LEDBar is {ledStatusColor}", Handler.LED_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 result++;
-                if(result > 5) //reset to 0
+                if (result > 5) //reset to 0
                 {
-                    if (MessageBox.Show(Handler.DELETE_LEDCOLORS, Handler.LED_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    result = 0;
+                    if (MessageBox.Show(Handler.CHECK_BEEP_SOUND, Handler.KEYPAD_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
-                        result = 0;
-                        if (MessageBox.Show(Handler.CHECK_BEEP_SOUND, Handler.KEYPAD_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        // Call the KeyPad Form.
+                        IsLEDBarMode = false;
+                        //KeyPadForm frm = new KeyPadForm();
+                        //frm.ShowDialog();
+
+                        HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
+
+                        // ASK TO CLICK ON MUTEALARM.
+                        if (WaitForKeyPadExpectedResponse(Handler.MUTEALARM_RESP_CMD, "0", 3000))
                         {
-                            // Call the KeyPad Form.
-                            IsLEDBarMode = false;
-                            KeyPadForm frm = new KeyPadForm();
-                            frm.ShowDialog();
+                            // CONVERT THE RESPONSE TO INTEGER, VALIDATE AND HEAR THE BEEP SOUND.
+                            bool bRep = int.TryParse("0", out int rep);
+                            if (bRep)
+                            {
+                                return;
+                            }
                         }
                     }
-                    else return;
                 }
                 SetLEDBarForeColor();
             }
@@ -118,6 +129,7 @@ public class Test
         while (elapsed < timeoutMs)
         {
             HardwareParameters.GetParameter(parameterName, out response);
+
             // Parse and Validate for Service Challenge and Service code values.           
             var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -129,12 +141,48 @@ public class Test
                     string key = token[0];
                     response = token[1];
                     break;
-                }
+                }              
             }
 
             if (!string.IsNullOrEmpty(response) && response == expectedValue)
             {
                 Logger.LogMessage(Level.Info, $"Response for LEDBar.ForceColor is {response}");
+                return true;
+            }
+
+            Thread.Sleep(interval);
+            elapsed += interval;
+        }
+
+        return false;
+    }
+
+    private bool WaitForKeyPadExpectedResponse(string parameterName, string expectedValue, int timeoutMs)
+    {
+        int elapsed = 0;
+        int interval = 300;
+        string response;
+
+        while (elapsed < timeoutMs)
+        {
+            HardwareParameters.GetParameter(parameterName, out response);
+            // Parse and Validate for Service Challenge and Service code values.           
+            var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                var token = line.Split(Handler.DELIMITER);                
+                if (token.Length > 0 && token[0] == Handler.KEYS_RESP_CMD)
+                {
+                    string k = token[0];
+                    response = token[1];
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(response) && response == expectedValue)
+            {
+                Logger.LogMessage(Level.Info, $"Response for KeyPad.Keys is {response}");
                 return true;
             }
 
