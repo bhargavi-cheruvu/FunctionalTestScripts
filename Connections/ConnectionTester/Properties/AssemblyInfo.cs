@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Thermo Fisher Scientific, Inc.")]
 [assembly: AssemblyProduct("ConnectionTester")]
-[assembly: AssemblyCopyright("Copyright © Thermo Fisher Scientific, Inc. 2022")]
+[assembly: AssemblyCopyright("Copyright © Thermo Fisher Scientific, Inc. 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -2,14 +2,26 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
     <ComponentGroup Id="Scripts_files" Directory="Scripts">
+      <Component Id="cmpB7s01QuGY0gHOdZwI72XY2M.AaA" Guid="*">
+        <File Id="filcQvfzxD1qe6wbBzhyVl71bkKg28" Source="$(var.BackupMemoryTest.TargetDir)\BackupMemoryTest.dll" />
+      </Component>
       <Component Id="cmpCEyWq1.NC806SmvaGRSHNbSiOs8" Guid="*">
         <File Id="fileWpxZl6tAh6j.QduMnBu7ElsVXk" Source="$(var.CANTest.TargetDir)\CANConnectorTest.dll" />
+      </Component>
+      <Component Id="cmpj_3l4bTPX_sEkDb1W.mmxU26asA" Guid="*">
+        <File Id="filILflC9TFfrN1WwdA2O3p4.1yDac" Source="$(var.ComputeModuleTest.TargetDir)\ComputeModuleTest.dll" />
+      </Component>
+      <Component Id="cmpR.b2xcGEfZNAQH31UWhKu1BXKkQ" Guid="*">
+        <File Id="filWGlUNfvyaOA.IQTMmaw.u8opnBA" Source="$(var.DegasserTest.TargetDir)\DegasserTest.dll" />
       </Component>
       <Component Id="cmpj6GVbNsapr_JLY8q50C6cnLh9E8" Guid="*">
         <File Id="filPjLyPAHcGsBoLLMWB1QEcJCK9lU" Source="$(var.DigitalIOTest.TargetDir)\DigitalIOTest.dll" />
       </Component>
       <Component Id="cmpazgEjhnUcMEUhvf9ngrtBIanvpc" Guid="*">
         <File Id="filK6t.ghNPqldnCPYAT2VH6riz8iU" Source="$(var.FANTest.TargetDir)\FANTest.dll" />
+      </Component>
+      <Component Id="cmpu2TDth7GYdt33gXns8o6o_Wmo3E" Guid="*">
+        <File Id="fildBLC0gXR3yMBoGiwCpW8XirMDgo" Source="$(var.LeakSensorTest.TargetDir)\LeakSensorTest.dll" />
       </Component>
       <Component Id="cmp5EFgTXqWgU.k7LZrzjBWjrj_NTY" Guid="*">
         <File Id="filhbiojX2qrWqdKwXjgQ76tdQOnyY" Source="$(var.LEDBarTest.TargetDir)\LEDBarTest.dll" />

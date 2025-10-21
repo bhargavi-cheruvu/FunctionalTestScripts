@@ -21,6 +21,7 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.LedBarForceColor, DeviceType = "USB", ConversionFormula = "IsNeeded" });
            
             // KeyPad
+            Add(new HardwareParameter() { Name = BoardParameterName.KeyPadTestMode, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.KeyPad, DeviceType = "USB", ConversionFormula = "IsNeeded" });
 
             // Service Level
@@ -47,6 +48,9 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibrate, DeviceType = "USB", ConversionFormula = "NotNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibOffset, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.MuteAlarm, DeviceType = "USB", ConversionFormula = "None" });
+
+            // Compute Module
+            Add(new HardwareParameter() { Name = BoardParameterName.TestDCFAlignment, DeviceType = "USB", ConversionFormula = "IsNeeded" });
         }
         catch
         {
@@ -82,6 +86,7 @@ public class BoardParameterName
     public const string Fan2Speed = "Fan2Speed";
 
     // KeyPad
+    public const string KeyPadTestMode = "Key.TestMode"; // need to check
     public const string KeyPad = "Keys"; // need to check
 
     //ServiceLevel
@@ -105,4 +110,7 @@ public class BoardParameterName
     public const string LeakSensorCalibrate = "LeakSensor.Calibrate";
     public const string LeakSensorCalibOffset = "LeakSensor.CalibOffset";
     public const string MuteAlarm = "MuteAlarm";
+
+    //Compute Module
+    public const string TestDCFAlignment = "TestDCFAlignment";
 }

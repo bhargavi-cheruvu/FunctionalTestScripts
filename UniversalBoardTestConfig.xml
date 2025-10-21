@@ -35,9 +35,11 @@
 			<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>
 			<Test Name="Digital Input/Output Test" Script="DigitalIOTest.dll"/>
 			<Test Name="FAN Test" Script="FANTest.dll"/>
+			<Test Name="ComputeModule Test" Script="ComputeModuleTest.dll"/>
 			<Test Name="USBHub Level Test" Script="USBHubTest.dll"/>
 			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
 			<Test Name="Key Pad / LEDs Test" Script="LEDBarTest.dll"/>
+			<Test Name="Degasser Test" Script="DegasserTest.dll"/>			
 			<Test Name="Backup Memory Status Test" Script="BackupMemoryTest.dll"/>
 			<Test Name="LeakSensor Test" Script="LeakSensorTest.dll"/>	
 		</Tests>

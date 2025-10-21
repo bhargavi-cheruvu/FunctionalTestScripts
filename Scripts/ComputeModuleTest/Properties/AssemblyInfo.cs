@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 
 // General information about an assembly is controlled through the following attributes.
 // Change these attribute values to modify the information associated with an assembly.
-[assembly: AssemblyTitle("LEDBarTest")]
+[assembly: AssemblyTitle("ComputeModuleTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Thermo Fisher Scientific, Inc.")]
-[assembly: AssemblyProduct("LEDBarTest")]
+[assembly: AssemblyProduct("ComputeModuleTest")]
 [assembly: AssemblyCopyright("Copyright © Thermo Fisher Scientific, Inc. 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
