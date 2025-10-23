@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,8 +31,13 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DegasserTest, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\DegasserTest.dll</HintPath>
+    </Reference>
     <Reference Include="Logger">
       <HintPath>C:\Program Files (x86)\UniversalBoardTestApp\Logger.dll</HintPath>
     </Reference>
@@ -54,23 +60,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>@echo off
-setlocal
-set TARGET_DIR=C:\Repo\FunctionalTestScripts\Scripts\DegasserTest\bin\Debug
-set DEST_DIR="C:\Program Files\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts"
-mkdir %25DEST_DIR%25
-robocopy %25TARGET_DIR%25 %25DEST_DIR%25 DegasserTest.pdb /R:3 /W:5
-if %25ERRORLEVEL%25 GEQ 8 (
-    echo Error copying DegasserTest.pdb
-    exit /b %25ERRORLEVEL%25
-)
-robocopy %25TARGET_DIR%25 %25DEST_DIR%25 DegasserTest.dll /R:3 /W:5
-if %25ERRORLEVEL%25 GEQ 8 (
-    echo Error copying DegasserTest.dll
-    exit /b %25ERRORLEVEL%25
-)
-endlocal
-exit /b 0
-</PostBuildEvent>
+    <PostBuildEvent>xcopy /y "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\" 
+xcopy /y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

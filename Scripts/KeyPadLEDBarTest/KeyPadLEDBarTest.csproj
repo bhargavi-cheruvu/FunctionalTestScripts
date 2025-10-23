@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7A603FEE-874A-4BBC-91B9-ED05344C9C53}</ProjectGuid>
+    <ProjectGuid>{98A3CCCA-4979-4A4E-B336-6EA3EE46F4A4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LEDBarTest</RootNamespace>
-    <AssemblyName>LEDBarTest</AssemblyName>
+    <RootNamespace>KeyPadLEDBarTest</RootNamespace>
+    <AssemblyName>KeyPadLEDBarTest</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -52,19 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper.cs" />
-    <Compile Include="KeyPadForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="KeyPadForm.Designer.cs">
-      <DependentUpon>KeyPadForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LEDBarFunctionalTest.cs" />
+    <Compile Include="KeyPadLEDBarFunctionalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="KeyPadForm.resx">
-      <DependentUpon>KeyPadForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

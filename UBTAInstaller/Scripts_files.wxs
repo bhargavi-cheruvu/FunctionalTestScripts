@@ -20,11 +20,11 @@
       <Component Id="cmpazgEjhnUcMEUhvf9ngrtBIanvpc" Guid="*">
         <File Id="filK6t.ghNPqldnCPYAT2VH6riz8iU" Source="$(var.FANTest.TargetDir)\FANTest.dll" />
       </Component>
+      <Component Id="cmpOLBKhKzfnzvmqu38.0HFoA8gWts" Guid="*">
+        <File Id="filxmhZ_eDOs3_KwyvzRw9E84U9_YQ" Source="$(var.KeyPadLEDBarTest.TargetDir)\KeyPadLEDBarTest.dll" />
+      </Component>
       <Component Id="cmpu2TDth7GYdt33gXns8o6o_Wmo3E" Guid="*">
         <File Id="fildBLC0gXR3yMBoGiwCpW8XirMDgo" Source="$(var.LeakSensorTest.TargetDir)\LeakSensorTest.dll" />
-      </Component>
-      <Component Id="cmp5EFgTXqWgU.k7LZrzjBWjrj_NTY" Guid="*">
-        <File Id="filhbiojX2qrWqdKwXjgQ76tdQOnyY" Source="$(var.LEDBarTest.TargetDir)\LEDBarTest.dll" />
       </Component>
       <Component Id="cmp4q32txvxByT3Ho3KNHCyWlpJgu8" Guid="*">
         <File Id="fileoJA.7xO3m0t_5gOagOBNz_oi2o" Source="$(var.ServiceLevelTest.TargetDir)\ServiceLevelTest.dll" />
