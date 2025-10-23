@@ -1,4 +1,5 @@
-﻿using UniversalBoardTestApp;
+﻿using System.Runtime.Remoting.Messaging;
+using UniversalBoardTestApp;
 
 public class Parser
 {
@@ -43,6 +44,11 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0NmtStart, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0SdoSW, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0SdoSB, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+
+            // Degasser            
+            Add(new HardwareParameter() { Name = BoardParameterName.Degasser_CMD, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.Degasser_PRESSURE, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.Degasser_PRESSURE_OFFSET, DeviceType = "USB", ConversionFormula = "IsNeeded" });
 
             // Leak Sensor
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibrate, DeviceType = "USB", ConversionFormula = "NotNeeded" });
@@ -105,6 +111,11 @@ public class BoardParameterName
 
     public const string CANLeftConnector = "0x11"; // need to check
     public const string CANRightConnector = "0x12";
+
+    // Degasser
+    public const string Degasser_CMD = "Degasser";
+    public const string Degasser_PRESSURE = "Degasser.Pressure";    
+    public const string Degasser_PRESSURE_OFFSET = "Degasser.Pressure.Offset";    
 
     //Leak Sensor
     public const string LeakSensorCalibrate = "LeakSensor.Calibrate";

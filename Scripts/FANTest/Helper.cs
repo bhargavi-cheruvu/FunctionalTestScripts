@@ -24,9 +24,30 @@ namespace Helper
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
     }
+    //public class ServiceLevelParameterNames
+    //{
+    //    public const string ServiceChallange = "Service.Challenge";        
+    //    public const string ServiceCodeRequest = "Service.Code";
+    //    public const string ValidateServiceCode = "~Service.Code";
+    //    public const string NoResponseFromDevice = "No response from device for Service.Challenge.";
+
+    //    public const string ServiceCodeFailure = "Service.Code was not accepted. Expected '1', got unexpected result.";
+    //    public const string ServiceCodeSuccess = "Device successfully switched to Service level.";
+
+    //    //public const string ServiceLevelUserMode = "Service.Lock";        
+    //   // public const string ServiceLock_Response = "~Service.Lock";
+    //    public const string ServiceChallangeResponse = "Challenge received: Service.Challenge=";
+    //  //  public const string UserMode = "Switched back to User Mode from ServiceLevel Mode";
+    //    public const string ServiceCode = "87794";
+    //    public const string ExpectedServiceCode = "1";
+    //    public const string ServiceLockResult = "OK";
+    //    public const int TimeInterval = 3000; //1000;      
+    //}
+
     public class ServiceLevelParameterNames
     {
-        public const string ServiceChallange = "Service.Challenge";        
+        public const string ServiceChallange = "Service.Challenge";
+        public const string ServiceChallange_Resp = "~Service.Challenge";
         public const string ServiceCodeRequest = "Service.Code";
         public const string ValidateServiceCode = "~Service.Code";
         public const string NoResponseFromDevice = "No response from device for Service.Challenge.";
@@ -34,14 +55,15 @@ namespace Helper
         public const string ServiceCodeFailure = "Service.Code was not accepted. Expected '1', got unexpected result.";
         public const string ServiceCodeSuccess = "Device successfully switched to Service level.";
 
-        //public const string ServiceLevelUserMode = "Service.Lock";        
-       // public const string ServiceLock_Response = "~Service.Lock";
+        public const string ServiceLevelUserMode = "Service.Lock";
+        public const string ServiceLock_Response = "~Service.Lock";
         public const string ServiceChallangeResponse = "Challenge received: Service.Challenge=";
-      //  public const string UserMode = "Switched back to User Mode from ServiceLevel Mode";
-        public const string ServiceCode = "87794";
+        public const string UserMode = "Switched back to User Mode from ServiceLevel Mode";
+        public const int ServiceChallangeVal = 0;
+        public const int ServiceCode = 87794;
         public const string ExpectedServiceCode = "1";
         public const string ServiceLockResult = "OK";
-        public const int TimeInterval = 3000; //1000;      
+        public const int TimeInterval = 1000;
     }
 
     public class FanParameterNames

@@ -33,11 +33,11 @@
     <Reference Include="HardwareParameterHandler">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Connections\HardwareParameterHandler.dll</HintPath>
     </Reference>
+    <Reference Include="KeyPadLEDBarTest">
+      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\KeyPadLEDBarTest.dll</HintPath>
+    </Reference>
     <Reference Include="LeakSensorTest">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\LeakSensorTest.dll</HintPath>
-    </Reference>
-    <Reference Include="LEDBarTest">
-      <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\LEDBarTest.dll</HintPath>
     </Reference>
     <Reference Include="ServiceLevelTest">
       <HintPath>..\..\..\Program Files (x86)\UniversalBoardTestApp\UniversalBoardTestConfig\Scripts\ServiceLevelTest.dll</HintPath>

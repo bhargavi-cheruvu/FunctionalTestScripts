@@ -38,7 +38,7 @@
 			<Test Name="ComputeModule Test" Script="ComputeModuleTest.dll"/>
 			<Test Name="USBHub Level Test" Script="USBHubTest.dll"/>
 			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
-			<Test Name="Key Pad / LEDs Test" Script="LEDBarTest.dll"/>
+			<Test Name="Key Pad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
 			<Test Name="Degasser Test" Script="DegasserTest.dll"/>			
 			<Test Name="Backup Memory Status Test" Script="BackupMemoryTest.dll"/>
 			<Test Name="LeakSensor Test" Script="LeakSensorTest.dll"/>	
