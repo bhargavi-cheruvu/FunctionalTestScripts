@@ -34,7 +34,7 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.Fan1Pwm, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.Fan2Pwm, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.Fan1Speed, DeviceType = "USB", ConversionFormula = "IsNeeded" });
-            Add(new HardwareParameter() { Name = BoardParameterName.Fan1Speed, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.Fan2Speed, DeviceType = "USB", ConversionFormula = "IsNeeded" });
 
             // Backup
             Add(new HardwareParameter() { Name = BoardParameterName.BackupMemory, DeviceType = "USB", ConversionFormula = "None" });
@@ -56,7 +56,7 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.MuteAlarm, DeviceType = "USB", ConversionFormula = "None" });
 
             // Compute Module
-            Add(new HardwareParameter() { Name = BoardParameterName.TestDCFAlignment, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.TestDCFAlignment, DeviceType = "USB", ConversionFormula = "NotNeeded" });//IsNeeded
         }
         catch
         {

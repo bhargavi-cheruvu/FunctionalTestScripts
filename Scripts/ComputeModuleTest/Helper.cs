@@ -18,6 +18,13 @@ namespace Helper
         public const char DELIMITER = '=';
         public const int TOKEN_LENGTH = 2;
         public const string Nothing = "";
+
+        public const int INDEX_ZERO = 0;
+        public const int INDEX_ONE = 1;
+
+        public const string TestDCFAlignment_STATUS = "~TestDCFAlignment";
+        public const string TestDCFAlignmentResponse = "OK";
+        public const string TESTDCFAlignment_INVALID_RESPONSE = "Invalid Response";
     }
     //public class ServiceLevelParameterNames
     //{

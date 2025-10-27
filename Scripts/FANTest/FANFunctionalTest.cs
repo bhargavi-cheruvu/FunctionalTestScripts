@@ -136,7 +136,7 @@ public class Test
             return false;
     }
 
-    public (int Resp1, int Resp2) CheckAndCalculateFANSpeeds(string fan1Value, string fan2Value)
+    public (int Resp1, int Resp2) CheckAndCalculateFANSpeeds(int fan1Value, int fan2Value)
     {
         // Send to Pump Module
         HardwareParameters.SetParameter(FanParameterNames.FAN1_COMMAND, fan1Value);
@@ -175,7 +175,7 @@ public class Test
             }
         }
 
-        if (Response1 != null) { result = int.Parse(Response1); }
+        if (Response1 != "") { result = int.Parse(Response1); }
             return result;
     }
 

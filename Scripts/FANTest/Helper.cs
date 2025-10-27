@@ -68,8 +68,8 @@ namespace Helper
 
     public class FanParameterNames
     {
-        public const string FAN1_COMMAND = "Fan1PWM";
-        public const string FAN2_COMMAND = "Fan2PWM";
+        public const string FAN1_COMMAND = "Fan1Pwm";
+        public const string FAN2_COMMAND = "Fan2Pwm";
 
         public const string FAN1_SPEED = "Fan1Speed";
         public const string FAN2_SPEED = "Fan2Speed";
@@ -77,14 +77,14 @@ namespace Helper
         public const string FAN1_SPEEDFROM_RESP = "~Fan1Pwm";
         public const string FAN2_SPEEDFROM_RESP = "~Fan2Pwm";
 
-        public const string FAN1_PWM_1 = "-26";
-        public const string FAN2_PWM_1 = "-26";
+        public const int FAN1_PWM_1 = -26;
+        public const int FAN2_PWM_1 = -26;
 
-        public const string FAN1_PWM_2 = "-127";
-        public const string FAN2_PWM_2 = "-127";
+        public const int FAN1_PWM_2 = -127;
+        public const int FAN2_PWM_2 = -127;
 
-        public const string FAN1_PWM_3 = "-255";
-        public const string FAN2_PWM_3 = "-255";
+        public const int FAN1_PWM_3 = -255;
+        public const int FAN2_PWM_3 = -255;
 
         public const int WAITTIME = 1000;
         public const int WAITTIME_INMILLISECONDS = 10 * 1000;
