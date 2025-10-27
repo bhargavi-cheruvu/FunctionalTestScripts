@@ -25,13 +25,28 @@ public class Test
 
     public bool ComputeModuleResponse()
     {
-        bool b = HardwareParameters.SetParameter("TestDCFAlignment", "");
-        bool b1 = HardwareParameters.GetParameter("TestDCFAlignment", out string resp1);
+        HardwareParameters.SetParameter("TestDCFAlignment", "");
+        HardwareParameters.GetParameter("TestDCFAlignment", out string resp);
 
-        if (b1)
+        var lines = resp.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string line in lines)
         {
-            return true;
+            var token = line.Split(Handler.DELIMITER);
+            if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == Handler.TestDCFAlignment_STATUS)
+            {
+                string key = token[Handler.INDEX_ZERO];
+                resp = token[Handler.INDEX_ONE];
+                break;
+            }
         }
-        return false;
-    }    
+
+        if (resp == Handler.TestDCFAlignmentResponse)
+            return true;
+        else
+        {
+            Logger.LogMessage(Level.Error, Handler.TESTDCFAlignment_INVALID_RESPONSE);
+            return false;
+        }
+    }
 }
