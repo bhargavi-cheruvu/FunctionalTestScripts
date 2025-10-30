@@ -78,67 +78,7 @@ public class Test
                 if (result > 5) //reset to 0
                 {
                     result = 0;
-
-                    IsLEDBarMode = false;
-                    
-                    //// Press MUTE ALARM Button
-                    //if (MessageBox.Show(Handler.PRESS_MUTEALARM_BUTTON, Handler.KEYPAD_CAPTION, MessageBoxButtons.OKCancel) == DialogResult.OK)
-                    //{
-                    //    // KeyPad functionality.
-                    //    IsLEDBarMode = false;                       
-
-                    //    HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
-
-                    //    // ASK TO CLICK ON MUTEALARM.
-                    //    if (WaitForKeyPadExpectedResponse(Handler.RESPONSE_KEYPROPERTY, "1", 3000))
-                    //    {
-                    //        // After MUTE ALARM Button is pressed.
-                    //        // Ask the user to proceed with SELECT Button to be pressed.
-                    //        if(MessageBox.Show(Handler.PRESS_SELECT_BUTTON, Handler.KEYPAD_CAPTION, MessageBoxButtons.OKCancel) == DialogResult.OK)
-                    //        {
-                    //            HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
-
-                    //            // POLL for 3 seconds continously, so that we receive Keys = 2 for SELECT BUTTON.
-                    //            if (WaitForKeyPadExpectedResponse(Handler.RESPONSE_KEYPROPERTY, "2", 3000))
-                    //            {
-                    //                // After SELECT Button is pressed.
-                    //                // Ask the user to proceed with DOCK Button to be pressed.
-                    //                if (MessageBox.Show(Handler.PRESS_DOCK_BUTTON, Handler.KEYPAD_CAPTION, MessageBoxButtons.OKCancel) == DialogResult.OK)
-                    //                {
-                    //                    HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
-
-                    //                    // POLL for 3 seconds continously, so that we receive Keys = 4 for DOCK BUTTON.
-                    //                    if (WaitForKeyPadExpectedResponse(Handler.RESPONSE_KEYPROPERTY, "4", 3000))
-                    //                    {
-                    //                        // After DOCK Button is pressed.
-                    //                        // Ask the user to proceed with PURGE Button to be pressed.
-                    //                        if (MessageBox.Show(Handler.PRESS_PURGE_BUTTON, Handler.KEYPAD_CAPTION, MessageBoxButtons.OKCancel) == DialogResult.OK)
-                    //                        {
-                    //                            HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
-
-                    //                            // POLL for 3 seconds continously, so that we receive Keys = 8 for PURGE BUTTON.
-                    //                            if (WaitForKeyPadExpectedResponse(Handler.RESPONSE_KEYPROPERTY, "8", 3000))
-                    //                            {
-                    //                                // After PURGE Button is pressed.
-                    //                                // Ask the user to proceed with FLOW Button to be pressed.
-                    //                                if (MessageBox.Show(Handler.PRESS_FLOW_BUTTON, Handler.KEYPAD_CAPTION, MessageBoxButtons.OKCancel) == DialogResult.OK)
-                    //                                {
-                    //                                    HardwareParameters.GetParameter(Handler.KEYPAD_TESTMODE, out responseVal);
-
-                    //                                    // POLL for 3 seconds continously, so that we receive Keys = 8 for PURGE BUTTON.
-                    //                                    if (WaitForKeyPadExpectedResponse(Handler.RESPONSE_KEYPROPERTY, "16", 3000))
-                    //                                    {
-                    //                                        return;
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //}
+                    IsLEDBarMode = false;                    
                 }
                 if (IsLEDBarMode) { SetLEDBarForeColor(); }
             }
@@ -227,8 +167,6 @@ public class Test
             Logger.LogMessage(Level.Error, "Unexpected Response");
             return "";
         }
-        //else
-        //    Logger.LogMessage(Level.Success, "Received expected response.");
 
         return response;
     }
@@ -295,7 +233,7 @@ public class Test
                 }
             }
 
-            if (!string.IsNullOrEmpty(response) && rVal == Convert.ToInt32(expectedValue))//response == expectedValue)
+            if (!string.IsNullOrEmpty(response) && rVal == Convert.ToInt32(expectedValue))
             {
                 Logger.LogMessage(Level.Info, $"Response for KeyPad.Keys is {rVal}");
                 return true;

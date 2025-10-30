@@ -5,11 +5,15 @@ using UniversalBoardTestApp;
 using Helper;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics.Eventing.Reader;
+using System.Collections.Generic;
 
 public class Test
 {
     // Version of the script. Gets displayed in database/protocol
-    private const string TestVersion = Handler.TEST_VERSION; // Version Number
+    private const string TestVersion = Handler.TEST_VERSION; // Version Number 
+    private static Dictionary<string, int> FanSpeeds = new Dictionary<string, int>();
+
     public bool Start()
     {
         if (ScriptHelper.CheckIfProcedureIsCancelled())
@@ -23,19 +27,15 @@ public class Test
             if (TestFANFunctionality()) return true;
             else return false;
         }
-        else return false;
-
-        //// testing purpose - remove this
-        //if (TestFANFunctionality()) return true;
-        //else return false;
+       else return false;
     }
 
     public bool SwitchToServiceLevel()
     {
         Logger.LogMessage(Level.Info, Handler.SwitchToServiceLevel);
-                
+        
         // Service challenge command        
-        HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceChallange, 0);
+        HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceChallange, ServiceLevelParameterNames.ServiceChallangeVal);
 
         // Wait for response ~Service.Challenge=<value>
         if (!WaitForResponse(ServiceLevelParameterNames.ServiceChallange, ServiceLevelParameterNames.TimeInterval, out string challengeValue))
@@ -43,7 +43,7 @@ public class Test
             Logger.LogMessage(Level.Error, ServiceLevelParameterNames.NoResponseFromDevice);
             return false;
         }
-        
+
         // service code command
         HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceCodeRequest, ServiceLevelParameterNames.ServiceCode);
                
@@ -82,7 +82,7 @@ public class Test
     private bool WaitForExpectedResponse(string parameterName, string expectedValue, int timeoutMs)
     {
         int elapsed = 0;
-        int interval = 300;
+        int interval = 100;
         string response;
 
         while (elapsed < timeoutMs)
@@ -98,6 +98,7 @@ public class Test
                 {
                     string key = token[0];
                     response = token[1];
+                    Logger.LogMessage(Level.Info, $"Response for Service.Code is { token[1]}");
                     break;
                 }
             }
@@ -117,74 +118,150 @@ public class Test
         // 1st iteration with -26 and -26 PWM Values.
         var result = CheckAndCalculateFANSpeeds(FanParameterNames.FAN1_PWM_1, FanParameterNames.FAN2_PWM_1);
 
-        //Calculated Speed Values for Fan1 and Fan2 are :- result.Resp1 and result.Resp2;
-
         // 2nd iteration with -127 and -127 PWM values.
         result = CheckAndCalculateFANSpeeds(FanParameterNames.FAN1_PWM_2, FanParameterNames.FAN2_PWM_2);
-
-        //Calculated Speed Values for Fan1 and Fan2 are :- result.Resp1 and result.Resp2;
 
         // 3rd iteration with -255 and -255 PWM values.
         result = CheckAndCalculateFANSpeeds(FanParameterNames.FAN1_PWM_3, FanParameterNames.FAN2_PWM_3);
 
-        //Calculated Speed Values for Fan1 and Fan2 are :- result.Resp1 and result.Resp2;
-
-        // Now, Stabilization is speed property value (+/-) 5. It is to be verified.. 
-        if (CheckStabilizationValue(result.Resp1, result.Resp2))
-            return true;
-        else
+        if (result.Resp1 == 0 && result.Resp2 == 0)
             return false;
+
+        return true; // need to check this. 
     }
 
     public (int Resp1, int Resp2) CheckAndCalculateFANSpeeds(int fan1Value, int fan2Value)
     {
+        int fan1SpeedVal = 0;
+        int fan2SpeedVal = 0;
         // Send to Pump Module
         HardwareParameters.SetParameter(FanParameterNames.FAN1_COMMAND, fan1Value);
         HardwareParameters.SetParameter(FanParameterNames.FAN2_COMMAND, fan2Value);
-        Thread.Sleep(FanParameterNames.WAITTIME);       // Wait Time in milliseconds.
+        Thread.Sleep(FanParameterNames.WAITTIME);               // Wait Time in milliseconds.
 
-        HardwareParameters.GetParameter(FanParameterNames.FAN1_SPEED, out string Response1);
-        HardwareParameters.GetParameter(FanParameterNames.FAN2_SPEED, out string Response2);
+        if (fan1Value == FanParameterNames.FAN1_PWM_1 && fan2Value == FanParameterNames.FAN2_PWM_1)
+        {
+            FanSpeeds.Clear();
+            HardwareParameters.GetParameter(FanParameterNames.FAN1_COMMAND, out string content1);
+            HardwareParameters.GetParameter(FanParameterNames.FAN2_COMMAND, out string content2);                       
+            FanSpeeds = ParseAndValidateFANResponse(content1);
+            FanSpeeds = ParseAndValidateFANResponse(content2);
 
-        // uncomment this code, while testing with the Device.
-        int fan1_Res = ParseAndValidateFANResponse(Response1);
-        int fan2_Res = ParseAndValidateFANResponse(Response2);
-
+            HardwareParameters.GetParameter(FanParameterNames.FAN1_SPEED, out string Response1);
+            HardwareParameters.GetParameter(FanParameterNames.FAN2_SPEED, out string Response2);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response1);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response2);
+        }
+        else if(fan1Value == FanParameterNames.FAN1_PWM_2 && fan2Value == FanParameterNames.FAN2_PWM_2)
+        {
+            FanSpeeds.Clear();
+            HardwareParameters.GetParameter(FanParameterNames.FAN1_SPEED, out string Response1);
+            HardwareParameters.GetParameter(FanParameterNames.FAN2_SPEED, out string Response2);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response1);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response2);
+        }
+        else if (fan1Value == FanParameterNames.FAN1_PWM_3 && fan2Value == FanParameterNames.FAN2_PWM_3)
+        {
+            FanSpeeds.Clear();
+            HardwareParameters.GetParameter(FanParameterNames.FAN1_SPEED, out string Response1);
+            HardwareParameters.GetParameter(FanParameterNames.FAN2_SPEED, out string Response2);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response1);
+            FanSpeeds = ParseAndValidateFANSpeeds(Response2);
+        }
         Thread.Sleep(FanParameterNames.WAITTIME_INMILLISECONDS);        // 10 seconds.
 
-        // Calculate the Speed Value.
-        int fan1SpeedVal = fan1_Res * FanParameterNames.SPEED_MULTIPLE_OFFSET;
-        int fan2SpeedVal = fan2_Res * FanParameterNames.SPEED_MULTIPLE_OFFSET;
-
-        return (fan1SpeedVal, fan2SpeedVal);
-    }
-  
-    private static int ParseAndValidateFANResponse(string Response1)
-    {
-        int result = 0;
-        var lines = Response1.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (string line in lines)
+        if (FanSpeeds.Count > 0 && FanSpeeds.ContainsKey(FanParameterNames.FAN1_SPEEDFROM_RESP) && FanSpeeds.ContainsKey(FanParameterNames.FAN2_SPEEDFROM_RESP))
         {
-            var token = line.Split(Handler.DELIMITER);
-            if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == FanParameterNames.FAN1_SPEEDFROM_RESP)
-            {
-                string key = token[Handler.INDEX_ZERO];
-                Response1 = token[Handler.INDEX_ONE];
-                break;
-            }
+            // Calculate the Speed Value. -- check this
+            fan1SpeedVal = FanSpeeds[FanParameterNames.FAN1_SPEEDFROM_RESP] * FanParameterNames.SPEED_MULTIPLE_OFFSET;
+            fan2SpeedVal = FanSpeeds[FanParameterNames.FAN2_SPEEDFROM_RESP] * FanParameterNames.SPEED_MULTIPLE_OFFSET;
         }
-
-        if (Response1 != "") { result = int.Parse(Response1); }
-            return result;
+        
+        StabilizationFanSpeedValue(fan1SpeedVal+5, fan2SpeedVal+5);           
+        return (fan1SpeedVal, fan2SpeedVal);    
     }
 
-    private bool CheckStabilizationValue(int Fan1CalcSpeedval, int Fan2CalcSpeedval)
+    public Dictionary<string, int> ParseAndValidateFANSpeeds(string res)
     {
-        // Stabilization could be speed property value +/ -5
-        Fan1CalcSpeedval += 5;
-        Fan2CalcSpeedval += 5;
+        FanSpeeds = ExtractResponseBasedonFANSpeed(res);
+        return FanSpeeds;
+    }
 
-        return true;
+    public Dictionary<string, int> ParseAndValidateFANResponse(string Response)
+    {
+        FanSpeeds = ExtractResponseBasedonFANNumber(Response, FanParameterNames.FAN1_PWM_1);
+        return FanSpeeds;
+    }
+
+    private static Dictionary<string, int> ExtractResponseBasedonFANSpeed(string Response)
+    {
+        string key = string.Empty;
+        int Rep = 0;
+        if (Response != null)
+        {
+            var lines = Response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+           
+            foreach (string line in lines)
+            {
+                var token = line.Split(Handler.DELIMITER);
+
+                // check for FAN speed Reponse                
+                if (token.Length > Handler.INDEX_ZERO && (token[Handler.INDEX_ZERO] == FanParameterNames.FAN1_SPEEDFROM_RESP) ||
+                    (token[Handler.INDEX_ZERO] == FanParameterNames.FAN2_SPEEDFROM_RESP))
+                {
+                    key = token[Handler.INDEX_ZERO];
+                    Response = token[Handler.INDEX_ONE];
+                    Rep = Convert.ToInt32(Response);
+                    if (!FanSpeeds.ContainsKey(key))
+                    {
+                        FanSpeeds.Add(key, Rep);
+                        Logger.LogMessage(Level.Info, $"Response for {key} is { Rep}");
+                    }
+                }
+            }
+            return FanSpeeds;
+        }
+        return null;
+    }
+    
+    private static Dictionary<string,int> ExtractResponseBasedonFANNumber(string Response, int expectedValue)
+    {
+        string key = string.Empty;
+        int Rep = 0;
+        if (Response != null)
+        {
+            var lines = Response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                var token = line.Split(Handler.DELIMITER);
+
+                // check for FAN1 / FAN2 Reponse                
+                if (token.Length > Handler.INDEX_ZERO && ((token[Handler.INDEX_ZERO] == FanParameterNames.FAN1_COMMAND_RESP) ||
+                (token[Handler.INDEX_ZERO] == FanParameterNames.FAN2_COMMAND_RESP)))
+                {
+                    key = token[Handler.INDEX_ZERO];
+                    Response = token[Handler.INDEX_ONE];
+                    Rep = Convert.ToInt32(Response);
+
+                    if (Rep == expectedValue)
+                    {
+                        if (!FanSpeeds.ContainsKey(key))
+                        {
+                            FanSpeeds.Add(key, Rep);
+                            Logger.LogMessage(Level.Info, $"Response for {key} is {Rep}");
+                        }
+                    }
+                }
+            }
+            return FanSpeeds;
+        }
+        return null;
+    }
+
+    private static void StabilizationFanSpeedValue(int Fan1CalSpeedVal, int Fan2CalSpeedVal)
+    {
+        Fan1CalSpeedVal += 5;
+        Fan2CalSpeedVal += 5;
     }
 }

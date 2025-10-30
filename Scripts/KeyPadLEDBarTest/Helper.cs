@@ -32,10 +32,10 @@ namespace Helper
         //public const string CHECK_BEEP_SOUND = "Press the Enabled Button and Verify there is a Beep Sound";
 
         public const string PRESS_MUTEALARM_BUTTON = "Press MUTEALARM Button and check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
-        public const string PRESS_SELECT_BUTTON = "Press SELECT Button and check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
+        public const string PRESS_SELECT_BUTTON = "Press SELECT Button 3 times and observe the selector LEDs \n behaviour and also check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
         public const string PRESS_DOCK_BUTTON = "Press DOCK Button and check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
         public const string PRESS_PURGE_BUTTON = "Press PURGE Button and check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
-        public const string PRESS_FLOW_BUTTON = "Press Flow Button and check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
+        public const string PRESS_FLOW_BUTTON = "Press Flow Button 3 times and observe the flow LEDs \n behaviour and also check for the Beep Sound. \n If Beep Sound is heard then click OK button to continue";
 
         public const string KEYPAD_CAPTION = "KeyPad";
         public const string RESPONSE_KEYPROPERTY = "Keys";

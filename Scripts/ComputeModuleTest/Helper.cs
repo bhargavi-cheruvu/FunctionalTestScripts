@@ -24,6 +24,7 @@ namespace Helper
 
         public const string TestDCFAlignment_STATUS = "~TestDCFAlignment";
         public const string TestDCFAlignmentResponse = "OK";
+        public const string TestDCFAlignmentErrorResponse = "DCF Alignment Test has completed. Code 4257.";
         public const string TESTDCFAlignment_INVALID_RESPONSE = "Invalid Response";
     }
     //public class ServiceLevelParameterNames
