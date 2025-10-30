@@ -54,6 +54,7 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibrate, DeviceType = "USB", ConversionFormula = "NotNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibOffset, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.MuteAlarm, DeviceType = "USB", ConversionFormula = "None" });
+            Add(new HardwareParameter() { Name = BoardParameterName.LeakCMD, DeviceType = "USB", ConversionFormula = "None" });
 
             // Compute Module
             Add(new HardwareParameter() { Name = BoardParameterName.TestDCFAlignment, DeviceType = "USB", ConversionFormula = "NotNeeded" });//IsNeeded
@@ -121,6 +122,7 @@ public class BoardParameterName
     public const string LeakSensorCalibrate = "LeakSensor.Calibrate";
     public const string LeakSensorCalibOffset = "LeakSensor.CalibOffset";
     public const string MuteAlarm = "MuteAlarm";
+    public const string LeakCMD = "Leak";
 
     //Compute Module
     public const string TestDCFAlignment = "TestDCFAlignment";

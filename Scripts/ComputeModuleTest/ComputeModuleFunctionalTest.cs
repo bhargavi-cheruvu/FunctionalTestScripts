@@ -41,7 +41,7 @@ public class Test
             }
         }
 
-        if (resp == Handler.TestDCFAlignmentResponse)
+        if (resp == Handler.TestDCFAlignmentResponse || resp == Handler.TestDCFAlignmentErrorResponse)
             return true;
         else
         {
