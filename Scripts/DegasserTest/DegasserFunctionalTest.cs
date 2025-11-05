@@ -1,10 +1,12 @@
 ﻿using Helper;
 using LogViewManager;
 using System;
+using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using System.Windows.Forms;
 using UniversalBoardTestApp;
 
 public class Test
@@ -12,11 +14,7 @@ public class Test
     [DllImport("GMH3x32E.dll")]
     public static extern Int16 UniversalOpenCom(Int16 ini16COMPortNumber, UInt32 inui32BaudRate, Int16 inui16ConverterType, Int16 ini16Parity, Int16 ini16StoppBits);
     [DllImport("GMH3x32E.dll")]
-    public static extern Int16 GMH_CloseCom();
-    [DllImport("GMH3x32E.dll")]
-    public static extern UInt32 GetAdditionalDelay();
-    [DllImport("GMH3x32E.dll")]
-    public static extern UInt32 SetAdditionalDelay(UInt32 inui32AdditionalDelay);
+    public static extern Int16 GMH_CloseCom();  
     [DllImport("GMH3x32E.dll")]
     unsafe public static extern Int16 GMH_GetType(Int32 inui32StatusCode, byte* outcarrStatusText);
     [DllImport("GMH3x32E.dll")]
@@ -28,13 +26,7 @@ public class Test
     [DllImport("GMH3x32E.dll")]
     unsafe public static extern Int16 GMH_GetErrorMessageRet(Int16 ini16ErrorCode, byte* outcarrErrorText);
     [DllImport("GMH3x32E.dll")]
-    unsafe public static extern Int16 GMH_GetStatusMessage(UInt32 inui32StatusCode, byte* outcarrStatusText);
-    [DllImport("GMH3x32E.dll")]
     unsafe public static extern Int16 GMH_GetErrorMessageFL(double indblErrorCode, byte* outcarrErrorText);
-    [DllImport("GMH3x32E.dll")]
-    public static extern Int16 GMH_GetVersionNumber();
-    [DllImport("GMH3x32E.dll")]
-    unsafe public static extern Int16 GMH_ReadLogger(Int16 ini16Adresse, UInt32 inui32FileNumber, UInt32* ini32ptrNumberOfData, double* inOADateptrStartDate, double* outdblarrLoggerData);
     [DllImport("GMH3x32E.dll")]
     unsafe public static extern Int16 GMH_SearchForComPorts(Int16* refi16ArrComPortNumbers, out Int16 outi16LenghtOfArray);
 
@@ -50,6 +42,9 @@ public class Test
     String strMeasurementText;
     String strUnitText;
 
+    string str = string.Empty;
+    short COMPortVal = 0;
+
     // Version of the script. Gets displayed in database/protocol
     private const string TestVersion = Handler.TEST_VERSION; // Version Number
     public bool Start()
@@ -63,7 +58,7 @@ public class Test
         if (SwitchToServiceLevel())
         {
             if (TestDegasserFunctionality()) return true;
-            else return false;
+            else return false;            
         }
         else return false;
     }
@@ -111,7 +106,6 @@ public class Test
             Thread.Sleep(interval);
             elapsed += interval;
         }
-
         response = null;
         return false;
     }  
@@ -150,18 +144,50 @@ public class Test
     }
 
     private bool TestDegasserFunctionality()
-    {        
-        int presureVal = CheckAndCalculateDegasserPressure();
-
-        // Now, Stabilization is speed property value (+/-) 0.5. It is to be verified.. 
-        if (CheckStabilizationPressureValue(presureVal))
+    {
+        double presureVal = CheckAndCalculateDegasserPressure();
+        GMH_CloseCom();
+        if (presureVal > 0)
             return true;
         else
             return false;
     }
-
+    
+    private void DisplayErrorMessage(Int16 ini16ErrorCode, Int32 ini32IntegerValue, double indblFloatValue)
+    {
+        unsafe
+        {
+            Int16 i16Length;
+            byte[] barrText = new byte[1024];
+            System.Text.UTF7Encoding enc = new System.Text.UTF7Encoding();
+            String strErrorMessage = "OK";
+            if (0 > ini16ErrorCode)
+            {
+                fixed (byte* cptrText = &barrText[0])
+                {
+                    if (-36 == ini16ErrorCode)
+                    {
+                        i16Length = GMH_GetErrorMessageFL(indblFloatValue, cptrText);
+                    }
+                    else
+                    {
+                        i16Length = GMH_GetErrorMessageRet(ini16ErrorCode, cptrText);
+                    }
+                }
+                strErrorMessage = enc.GetString(barrText, 0, i16Length);
+            }
+            MessageBox.Show(strErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+        }
+    }
     private void ReadCOMPorts()
     {
+        this.i16GMHAddress = 1;
+        
+        Int16 _i16_Priority = 0;
+        Int32 i32IntegerValue = 0;
+        double dblFloatValue = 0;
+        bool bFoundDevice = false;
+
         unsafe
         {
             fixed (Int16* i16_ptr_Temp = &i16ArrComPortArray[0])
@@ -171,59 +197,170 @@ public class Test
         }
         if (i16AnzahlDerComPorts > 0)
         {
-            string str = "System has " + i16AnzahlDerComPorts + " COM-Ports";           
+            string str = "System has " + i16AnzahlDerComPorts + " COM-Ports";
+            for (Int16 _counter = 0; _counter < i16AnzahlDerComPorts; _counter++)
+            {
+                str = "";
+                str = str + "COM" + i16ArrComPortArray[_counter];
+                COMPortVal = i16ArrComPortArray[_counter];
+            }
+        }
+        this.i16ComPortNummer = COMPortVal;
+
+        this.i16ErrorCode = UniversalOpenCom(this.i16ComPortNummer, 38400, 10, 0, 0); /*Try GMH 5000*/
+        if (this.i16ErrorCode >= 0)
+        {
+            for (Int32 i32Counter = 0; i32Counter <= 9; i32Counter++)
+            {
+                this.i16GMHAddress = (Int16)(1 + (10 * i32Counter));
+                unsafe
+                {
+                    this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, 12, &_i16_Priority, &dblFloatValue, &i32IntegerValue);
+                }
+                if (-34 == this.i16ErrorCode) /*No GMH 5000 detected, use GMH 3000 instead*/
+                {
+                    GMH_CloseCom();
+                    UniversalOpenCom(this.i16ComPortNummer, 4800, 8, 0, 0);
+                    unsafe
+                    {
+                        this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, 12, &_i16_Priority, &dblFloatValue, &i32IntegerValue);
+                    }
+                }
+                if (0 == this.i16ErrorCode)
+                {                    
+                    bFoundDevice = true;
+                    break;
+                }
+            }
+            if (false == bFoundDevice)
+            {
+                GMH_CloseCom();
+                MessageBox.Show("Found no device on selected COM Port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+        else
+        {
+            this.DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
+        }
+
+        Int16 i16Priority = 0;    
+        Int16 i16Length = -1;
+        byte[] barrTypeString = new byte[1024];
+        System.Text.UTF7Encoding encTextEncoding = new System.Text.UTF7Encoding();
+
+
+        i16GMHAddress = 1;
+        unsafe
+        {
+            this.i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.IDNummerLesen, &i16Priority, &dblFloatValue, &i32IntegerValue);
+        }
+        if (i16ErrorCode < 0)
+        {
+            this.DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
+        }
+        else
+        {
+            i32GMHSerialNumber = i32IntegerValue;
+            unsafe
+            {
+                fixed (byte* char_ptr_Temp = &barrTypeString[0])
+                {
+                    i16Length = GMH_GetType(i32GMHSerialNumber, char_ptr_Temp);
+                }
+            }
+            strGMHTypeString = encTextEncoding.GetString(barrTypeString, 0, i16Length);      
+        }
+        unsafe
+        {
+            i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.MessbereichMessartLesen, &i16Priority, &dblFloatValue, &i32IntegerValue);
+        }
+        if (i16ErrorCode == (Int16)Fehlermeldungen.NegativeQuittung)
+        {
+            unsafe
+            {
+                i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.AnzeigeMessartLesen, &i16Priority, &dblFloatValue, &i32IntegerValue);
+            }
+        }
+        if (i16ErrorCode < 0)
+        {
+            DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
+        }
+        else
+        {
+            unsafe
+            {
+                fixed (byte* char_ptr_Temp = &barrTypeString[0])
+                {
+                    i16Length = GMH_GetMeasurement((Int16)i32IntegerValue, char_ptr_Temp);
+                }
+            }
+            strMeasurementText = encTextEncoding.GetString(barrTypeString, 0, i16Length);
+        }
+        unsafe
+        {
+            i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.MessbereichEinheitLesen, &i16Priority, &dblFloatValue, &i32IntegerValue);
+        }
+        if (i16ErrorCode == (Int16)Fehlermeldungen.NegativeQuittung)
+        {
+            unsafe
+            {
+                i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.AnzeigeeinheitLesen, &i16Priority, &dblFloatValue, &i32IntegerValue);
+            }
+        }
+        if (i16ErrorCode < 0)
+        {
+            this.DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
+        }
+        else
+        {
+            unsafe
+            {
+                fixed (byte* char_ptr_Temp = &barrTypeString[0])
+                {
+                    i16Length = GMH_GetUnit((Int16)i32IntegerValue, char_ptr_Temp);
+                }
+            }
+            strUnitText = encTextEncoding.GetString(barrTypeString, 0, i16Length);
         }
     }
 
     private double ReadCurrentDisplayValue()
     {
+
         Int16 i16Priority;
         double dblFloatValue;
         Int32 i32IntergerValue;
-        i16GMHAddress = 1;
-
-        // Read COM Port
-        this.i16ErrorCode = UniversalOpenCom(this.i16ComPortNummer, 38400, 10, 0, 0); /*Try GMH 5000*/
         unsafe
         {
-            //this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, (Int16)GHM_TransmitFunktion.AnzeigewertLesen, &i16Priority, &dblFloatValue, &i32IntergerValue);
-            this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadDisplayUnit, &i16Priority, &dblFloatValue, &i32IntergerValue);
+            this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, (Int16)GHM_TransmitFunktion.AnzeigewertLesen, &i16Priority, &dblFloatValue, &i32IntergerValue);
         }
-        if(i16ErrorCode < 0)
+        if (i16ErrorCode < 0)
         {
-            return 0.0;
+            this.DisplayErrorMessage(this.i16ErrorCode, i32IntergerValue, dblFloatValue);
         }
-
-        return dblFloatValue;      
+        return dblFloatValue;
     }
 
-    public int CheckAndCalculateDegasserPressure()
+    public double CheckAndCalculateDegasserPressure()
     {
         // Send to Pump Module
         HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_CMD, Handler.INDEX_ONE);
-        Thread.Sleep(DegasserParameterNames.WAITTIME_THREE_MINS); //wait for atleast 2 min's
-        
+        Thread.Sleep(DegasserParameterNames.WAITTIME_TWO_MINS); //wait for atleast 2 min's
         HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response1);
-
         Thread.Sleep(DegasserParameterNames.WAITTIME_ONE_MIN); // monitor for 1 min
-
         HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response2);
         Thread.Sleep(DegasserParameterNames.WAITTIME_THIRTY_SECONDS); // outputs over 30 seconds.
 
-        //  var reply = ParseAndValidateDegasserResponse(response1, response2);
-
         //Interact with the GMH3x32.dll and read the vaccum meter value (external value).
-
         // Read COMPORT
         ReadCOMPorts();
-
-        // Read Device Type
-        ReadDeviceType();
+        MessageBox.Show(" " + COMPortVal, "Degasser");
 
         // Read out external pressure sensor
-        // <external_value>
-        double externalValue = ReadCurrentDisplayValue(); //reply.externalVal;// needs to be read from barometer
-        double Value = Convert.ToDouble(response2);    //reply.Val;
+        double externalValue = ReadCurrentDisplayValue();
+        MessageBox.Show(" " + externalValue, "Degasser");
+        // Get the Parameter value from the response2.
+        double Value = ExtractDegasserPressureVal(response2);
 
         // Calculate <offset> = <external_value> - <value>
         double Offset = externalValue - Value;   // Resolution: 0.01 mbar
@@ -240,116 +377,17 @@ public class Test
 
         // Need to check <external_value> is within limits
 
-        //Check <value> against range 8000..15000 cts.
+        // Check <value> against range 8000..15000 cts.
 
-        //Stabilization: pressure +/- 0.5 mbar (to be verified)
+        // Stabilization: pressure +/- 0.5 mbar (to be verified)
         // Limits: pressure +/ -0.5 mbar(to be verified)
 
         // Convert pressureVal to integer and Stabilize
-        int pVal = Convert.ToInt32(pressureVal);
-
-        return pVal;
-        //return (externalValue, Value);
+        double pVal = ExtractDegasserPressureVal(pressureVal);
+        return CheckStabilizationPressureValue(pVal);
     }
-
-    private void ReadDeviceType()
-    {
-        Int16 i16Priority = 0;
-        double dblFloatValue = 0;
-        Int32 i32IntegerValue = 0;
-        Int16 i16Length = -1;
-        byte[] barrTypeString = new byte[1024];
-        System.Text.UTF7Encoding encTextEncoding = new System.Text.UTF7Encoding();
-
-        i16GMHAddress = 1;
-        unsafe
-        {
-            this.i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadIDNumber, &i16Priority, &dblFloatValue, &i32IntegerValue);
-        }
-        if (i16ErrorCode < 0)
-        {
-           // this.DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
-        }
-        else
-        {
-            i32GMHSerialNumber = i32IntegerValue;
-            unsafe
-            {
-                fixed (byte* char_ptr_Temp = &barrTypeString[0])
-                {
-                    i16Length = GMH_GetType(i32GMHSerialNumber, char_ptr_Temp);
-                }
-            }
-            strGMHTypeString = encTextEncoding.GetString(barrTypeString, 0, i16Length);           
-        }
-        unsafe
-        {
-            i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadMeasurementRangeAndType, &i16Priority, &dblFloatValue, &i32IntegerValue);
-        }
-        if (i16ErrorCode == -38) // (Int16)Fehlermeldungen.NegativeQuittung)
-        {
-            unsafe
-            {
-                i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadDisplayMeasurementType, &i16Priority, &dblFloatValue, &i32IntegerValue);
-            }
-        }
-        if (i16ErrorCode < 0)
-        {
-            //DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
-        }
-        else
-        {
-            unsafe
-            {
-                fixed (byte* char_ptr_Temp = &barrTypeString[0])
-                {
-                    i16Length = GMH_GetMeasurement((Int16)i32IntegerValue, char_ptr_Temp);
-                }
-            }
-            strMeasurementText = encTextEncoding.GetString(barrTypeString, 0, i16Length);
-        }
-        unsafe
-        {
-            i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadMeasurementRangeUnit, &i16Priority, &dblFloatValue, &i32IntegerValue);
-        }
-        if (i16ErrorCode == -38) //(Int16)Fehlermeldungen.NegativeQuittung)
-        {
-            unsafe
-            {
-                i16ErrorCode = GMH_Transmit(i16GMHAddress, (Int16)GHM_TransmitFunktion.ReadDisplayUnit, &i16Priority, &dblFloatValue, &i32IntegerValue);
-            }
-        }
-        if (i16ErrorCode < 0)
-        {
-            //this.DisplayErrorMessage(this.i16ErrorCode, i32IntegerValue, dblFloatValue);
-        }
-        else
-        {
-            unsafe
-            {
-                fixed (byte* char_ptr_Temp = &barrTypeString[0])
-                {
-                    i16Length = GMH_GetUnit((Int16)i32IntegerValue, char_ptr_Temp);
-                }
-            }
-            strUnitText = encTextEncoding.GetString(barrTypeString, 0, i16Length);            
-        }
-    }
-
-    public (int externalVal, int Val) ParseAndValidateDegasserResponse(string Response1, string Response2)
-    {
-        Response1 = ExtractDegasserPressureVal(Response1, DegasserParameterNames.DEGASSER_PRESSURE); // need to check
-        Response2 = ExtractDegasserPressureVal(Response2, DegasserParameterNames.DEGASSER_PRESSURE);
-
-        if (Response1 == string.Empty || Response2 == string.Empty)
-            return (0, 0);
-
-        int eValue = Convert.ToInt32(Response1);
-        int Value = Convert.ToInt32(Response2);
-        return (eValue, Value);
-    }
-
-    private static string ExtractDegasserPressureVal(string Response, string expectedValue)
+       
+    private static double ExtractDegasserPressureVal(string Response)
     {
         if (Response != null)     
         {
@@ -360,24 +398,23 @@ public class Test
                 var token = line.Split(Handler.DELIMITER);
 
                 // check for Degasser pressure Reponse                
-                if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == DegasserParameterNames.DEGASSER_PRESSURE_VAL) //need to check
+                if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == DegasserParameterNames.DEGASSER_PRESSURE_VAL)
                 {
                     string key = token[Handler.INDEX_ZERO];
                     Response = token[Handler.INDEX_ONE];
 
-                    return Response;
-                   // if (!string.IsNullOrEmpty(Response) && Response == expectedValue) return Response;
+                    double Value = Convert.ToInt32(Response);
+                    return Value;              
                 }
             }
-        }        
-        return string.Empty;
+        }
+        return 0.0;
     }
 
-    private bool CheckStabilizationPressureValue(double degasserPressureVal)
+    private double CheckStabilizationPressureValue(double degasserPressureVal)
     {
         // Stabilization could be speed property value +/- 0.5
-        degasserPressureVal += 0.5;
-      
-        return true;
+        degasserPressureVal += 0.5;      
+        return degasserPressureVal;
     }
 }
