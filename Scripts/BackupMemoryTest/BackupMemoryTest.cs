@@ -22,8 +22,8 @@ public class Test
     {
         string resp;
         // Backup Memory command
-        HardwareParameters.SetParameter(Handler.BACKUPMEMORY_COMMAND, Handler.REQUEST);
-        HardwareParameters.GetParameter(Handler.BACKUPMEMORY_COMMAND, out resp);
+        HardwareParameters.SetParameter(Handler.BACKUPMEMORY_COMMAND, Handler.REQUEST, true);
+        HardwareParameters.GetParameter(Handler.BACKUPMEMORY_COMMAND, out resp, true);
 
         var lines = resp.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -39,7 +39,10 @@ public class Test
         }
 
         if (resp == Handler.BackupStatusResponse)
+        {
+            Logger.LogMessage(Level.Info, resp);
             return true;
+        }
         else
         {
             Logger.LogMessage(Level.Error, Handler.BACKUPMEMORY_INVALID_RESPONSE);

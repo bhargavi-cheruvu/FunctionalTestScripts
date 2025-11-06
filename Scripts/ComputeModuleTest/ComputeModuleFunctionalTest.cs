@@ -41,12 +41,17 @@ public class Test
             }
         }
 
-        if (resp == Handler.TestDCFAlignmentResponse || resp == Handler.TestDCFAlignmentErrorResponse)
+        if (resp == Handler.TestDCFAlignmentErrorResponse)
+        {
+            Logger.LogMessage(Level.Info, resp);
             return true;
-        else
+        }
+        else if(resp != Handler.TestDCFAlignmentResponse)
         {
             Logger.LogMessage(Level.Error, Handler.TESTDCFAlignment_INVALID_RESPONSE);
             return false;
         }
+
+        return true;
     }
 }

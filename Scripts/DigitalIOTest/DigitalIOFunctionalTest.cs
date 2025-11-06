@@ -36,16 +36,16 @@ public class Test
     {
         string response;
         HardwareParameters.SetParameter(HardwareParameterNames.Relay1State, state);
-        HardwareParameters.GetParameter(HardwareParameterNames.Relay1State, out response);
+        HardwareParameters.GetParameter(HardwareParameterNames.Relay1State, out response, true);
 
         HardwareParameters.SetParameter(HardwareParameterNames.Relay2State, state);
-        HardwareParameters.GetParameter(HardwareParameterNames.Relay2State, out response);
+        HardwareParameters.GetParameter(HardwareParameterNames.Relay2State, out response, true);
 
         HardwareParameters.SetParameter(HardwareParameterNames.Relay3State, state);
-        HardwareParameters.GetParameter(HardwareParameterNames.Relay3State, out response);
+        HardwareParameters.GetParameter(HardwareParameterNames.Relay3State, out response, true);
 
         HardwareParameters.SetParameter(HardwareParameterNames.Relay4State, state);
-        HardwareParameters.GetParameter(HardwareParameterNames.Relay4State, out response);
+        HardwareParameters.GetParameter(HardwareParameterNames.Relay4State, out response, true);
 
 
         //check the initial relay responses.
@@ -60,10 +60,9 @@ public class Test
   
     private bool TryGetParameter(string parameterName, out string value)
     {
-        HardwareParameters.GetParameter(parameterName, out value);
+        HardwareParameters.GetParameter(parameterName, out value, true);
         if (!string.IsNullOrEmpty(value))
-        {
-            Logger.LogMessage(Level.Success, $"Response from device is: {value}");
+        {          
             return true;
         }
 
@@ -153,6 +152,7 @@ public class Test
             {
                 if (parsed[key].Equals(expectedValue))
                 {
+                    Logger.LogMessage(Level.Info, $"Response from device is {key}: {expectedValue}");
                     isValid = true; continue;                    
                 }               
                 else if (!parsed[key].Equals(expectedValue))
@@ -184,7 +184,7 @@ public class Test
             {
                 string key = token[0].Trim();
                 string value = token[1].Trim();
-                result[key] = value;               
+                result[key] = value;
             }
         }
         return result;

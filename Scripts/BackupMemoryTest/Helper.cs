@@ -15,15 +15,11 @@ namespace Helper
         public const string BackupStatusResponse = "0,0,1";
         public const char DELIMITER = '=';
         public const string REQUEST = "?";
-
         public const string BACKUPMEMORY_COMMAND= "BackupMemory.Status";
         public const string BACKUPMEMORY_STATUS = "~BackupMemory.Status";
-
         public const string BACKUPMEMORY_INVALID_RESPONSE = "Invalid Response or Backup memory is Disconnected";
-
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
-
         public const char NEWLINE = '\n';
         public const char CARRAIGE_RETURN = '\r';
     }

@@ -50,7 +50,7 @@ public class Test
 
         // Switch to User Mode from ServiceLevel
         HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceLevelUserMode, Handler.Nothing);
-        HardwareParameters.GetParameter(ServiceLevelParameterNames.ServiceLevelUserMode, out lockState);
+        HardwareParameters.GetParameter(ServiceLevelParameterNames.ServiceLevelUserMode, out lockState, true);
 
         if(lockState.Length > 0)
         {
@@ -85,7 +85,7 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             if (!string.IsNullOrEmpty(response))
             {
                 // Parse and Validate for Service Challenge and Service code values.           
@@ -120,7 +120,7 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             // Parse and Validate for Service Challenge and Service code values.           
             var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 

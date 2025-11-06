@@ -151,9 +151,7 @@ public class Test
                 else return false;
             }
         }
-        else return false;
-
-        return true;
+        return false;
     }
 
     private string UpdateLEDValue()
