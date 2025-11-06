@@ -25,15 +25,12 @@ namespace Helper
         public const int INDEX_ONE = 1;
         public const int INDEX_TWO = 2;
         public const int INDEX_THREE = 3;
-
         public const string PNPDEVICEID = "PNPDeviceID";
         public const string DEVICEID = "DeviceID";
         public const string MODEL = "Model";
-
         public const string ONE_USB_DETECTED = "One USB sticks detected.";
         public const string TWO_USB_DETECTED = "Two USB sticks detected.";
         public const string THREE_USB_DETECTED = "Three USB sticks detected.";
-
         public const string UNKNOWN = "UnKnown";
     }    
 }

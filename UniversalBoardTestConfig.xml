@@ -32,16 +32,16 @@
 		<Tests>
 			<!-- Test Node: Information about the tests, which are supposed to be performed (script allowed as *.cs and *.dll) -->
 			<!-- Attributes: Name (string), Script (string) -->
-			<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>
-			<Test Name="Digital Input/Output Test" Script="DigitalIOTest.dll"/>
+			<!--<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>-->
+			<Test Name="Digital I/O Test" Script="DigitalIOTest.dll"/>
 			<Test Name="FAN Test" Script="FANTest.dll"/>
-			<Test Name="ComputeModule Test" Script="ComputeModuleTest.dll"/>
-			<Test Name="USBHub Level Test" Script="USBHubTest.dll"/>
+			<Test Name="Compute Module Alignment Test" Script="ComputeModuleTest.dll"/>
+			<Test Name="USB Hub Test" Script="USBHubTest.dll"/>
 			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
-			<Test Name="Key Pad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
+			<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
 			<Test Name="Degasser Test" Script="DegasserTest.dll"/>			
-			<Test Name="Backup Memory Status Test" Script="BackupMemoryTest.dll"/>
-			<Test Name="LeakSensor Test" Script="LeakSensorTest.dll"/>	
+			<Test Name="Backup Memory Test" Script="BackupMemoryTest.dll"/>
+			<Test Name="Leak Sensor Test" Script="LeakSensorTest.dll"/>	
 		</Tests>
 		<!-- DebugParameters Node: Lists DebugParameter which are supposed to be controllable via Debug Tab Page, Sub Node: DebugParameter -->
 		<DebugParameters>

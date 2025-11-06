@@ -30,8 +30,7 @@ public class Test
         HardwareParameters.SetParameter(LeakSensorParameters.LEAKSENSOR_CALIBRATE, Handler.Nothing);
 
         // Wait for response ~LeakSensor.Calibrate
-        if (!WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE, LeakSensorParameters.TimeInterval, out string calibrateValue))
-        //if (!WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE_RESP, LeakSensorParameters.TimeInterval, out string calibrateValue))
+        if (!WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE, LeakSensorParameters.TimeInterval, out string calibrateValue))     
         {
             Logger.LogMessage(Level.Error, LeakSensorParameters.NoResponseFromDevice);
             return false;
@@ -43,20 +42,16 @@ public class Test
         // Wait for expected response: ~LeakSensor.CalibOffset
         if (!WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE_OFFSET, LeakSensorParameters.TimeInterval, out string calibrateOffsetVal))
         {
-           // Logger.LogMessage(Level.Error, "Error Message");
             return false;
         }
-        //else
-        //    Logger.LogMessage(Level.Success, "Success");
-
+   
         // apply xx ml water to the leak sensor.
         if (MessageBox.Show($"Apply 20 ml  to the Leak Sensor", "Leak Sensor", MessageBoxButtons.OKCancel) == DialogResult.OK)
         {
             Thread.Sleep(LeakSensorParameters.ReactionTime_AfterApplyingWater);
 
             // check for the Response, if it is null, then throw/log error.
-            //if(WaitForResponse($"", 1000, out string reply)) // needs some input here, what command to be queried?
-            if (WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE_OFFSET, 60 * 1000, out string reply)) // needs some input here, what command to be queried?
+            if (WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE_OFFSET, 60 * 1000, out string reply)) 
             {
                 Logger.LogMessage(Level.Info, reply);                
             }
@@ -71,7 +66,6 @@ public class Test
         // Send MuteAlarm
         HardwareParameters.SetParameter(LeakSensorParameters.MUTE_ALARM, Handler.Nothing);
         HardwareParameters.GetParameter(LeakSensorParameters.MUTE_ALARM, out MuteAlarmState);
-       // HardwareParameters.GetParameter(LeakSensorParameters.MUTE_ALARM_RESP, out MuteAlarmState);
 
         if (MuteAlarmState.Length > 0)
         {

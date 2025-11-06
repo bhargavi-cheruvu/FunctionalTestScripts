@@ -26,10 +26,8 @@ namespace Helper
         public const string ServiceCodeRequest = "Service.Code";
         public const string ValidateServiceCode = "~Service.Code";
         public const string NoResponseFromDevice = "No response from device for Service.Challenge.";
-
         public const string ServiceCodeFailure = "Service.Code was not accepted. Expected '1', got unexpected result.";
         public const string ServiceCodeSuccess = "Device successfully switched to Service level.";
-
         public const string ServiceLevelUserMode = "Service.Lock";        
         public const string ServiceLock_Response = "~Service.Lock";
         public const string ServiceChallangeResponse = "Challenge received: Service.Challenge=";

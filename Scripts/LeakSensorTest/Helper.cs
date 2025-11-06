@@ -20,10 +20,8 @@ namespace Helper
         public const char DELIMITER = '=';
         public const int TOKEN_LENGTH = 2;
         public const string Nothing = "";
-
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
-
         public const string REQUEST = "?";
     }
 
@@ -31,20 +29,15 @@ namespace Helper
     {
         public const string LEAKSENSOR_TEST = "Leak Sensor Test Script.";
         public const string LEAKSENSOR_CALIBRATE = "LeakSensor.Calibrate";
-
         public const string LEAKSENSOR_CALIBRATE_RESP = "~LeakSensor.Calibrate";
         public const string NoResponseFromDevice = "No response from device for LeakSensor.Calibrate";
-
-        public const string LEAKSENSOR_CALIBRATE_OFFSET = "LeakSensor.CalibOffset"; //"~LeakSensor.CalibOffset";
+        public const string LEAKSENSOR_CALIBRATE_OFFSET = "LeakSensor.CalibOffset";
         public const int TimeInterval = 1000;
-
         public const string MUTE_ALARM = "MuteAlarm";
         public const string MUTE_ALARM_RESP = "~MuteAlarm";
         public const string ExpectedResult = "OK";
-
         public const int ReactionTime_AfterApplyingWater = 20000;
-
-        public const string Dry_LeakSensor_Resp = "Leak"; //"~Leak";
+        public const string Dry_LeakSensor_Resp = "~Leak";
         public const string Dry_LeakSensor_ExpectedResp = "0";
         public const int TimeInterval_DryLeakSensor = 30000;      
     }
@@ -55,43 +48,12 @@ namespace Helper
         public const string ServiceCodeRequest = "Service.Code";
         public const string ValidateServiceCode = "~Service.Code";
         public const string NoResponseFromDevice = "No response from device for Service.Challenge.";
-
         public const string ServiceCodeFailure = "Service.Code was not accepted. Expected '1', got unexpected result.";
-        public const string ServiceCodeSuccess = "Device successfully switched to Service level.";
-
-        //public const string ServiceLevelUserMode = "Service.Lock";        
-       // public const string ServiceLock_Response = "~Service.Lock";
+        public const string ServiceCodeSuccess = "Device successfully switched to Service level.";       
         public const string ServiceChallangeResponse = "Challenge received: Service.Challenge=";
-      //  public const string UserMode = "Switched back to User Mode from ServiceLevel Mode";
         public const string ServiceCode = "87794";
         public const string ExpectedServiceCode = "1";
         public const string ServiceLockResult = "OK";
         public const int TimeInterval = 3000; //1000;      
-    }
-
-    public class FanParameterNames
-    {
-        public const string FAN1_COMMAND = "Fan1PWM";
-        public const string FAN2_COMMAND = "Fan2PWM";
-
-        public const string FAN1_SPEED = "Fan1Speed";
-        public const string FAN2_SPEED = "Fan2Speed";
-
-        public const string FAN1_SPEEDFROM_RESP = "~Fan1Pwm";
-        public const string FAN2_SPEEDFROM_RESP = "~Fan2Pwm";
-
-        public const string FAN1_PWM_1 = "-26";
-        public const string FAN2_PWM_1 = "-26";
-
-        public const string FAN1_PWM_2 = "-127";
-        public const string FAN2_PWM_2 = "-127";
-
-        public const string FAN1_PWM_3 = "-255";
-        public const string FAN2_PWM_3 = "-255";
-
-        public const int WAITTIME = 1000;
-        public const int WAITTIME_INMILLISECONDS = 10 * 1000;
-
-        public const int SPEED_MULTIPLE_OFFSET = 15;
-    }
+    }  
 }
