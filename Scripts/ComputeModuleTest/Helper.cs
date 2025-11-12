@@ -19,7 +19,7 @@ namespace Helper
         public const string Nothing = "";
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
-        public const string TestDCFAlignment_STATUS = "~TestDCFAlignment";
+        public const string TestDCFAlignment_STATUS = "~Err";
         public const string TestDCFAlignmentResponse = "OK";
         public const string TestDCFAlignmentErrorResponse = "DCF Alignment Test has completed. Code 4257.";
         public const string TESTDCFAlignment_INVALID_RESPONSE = "Invalid Response";

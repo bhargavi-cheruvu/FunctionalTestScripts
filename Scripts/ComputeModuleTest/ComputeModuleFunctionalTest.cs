@@ -25,8 +25,9 @@ public class Test
 
     public bool ComputeModuleResponse()
     {
+        string result = string.Empty;
         HardwareParameters.SetParameter("TestDCFAlignment", "");
-        HardwareParameters.GetParameter("TestDCFAlignment", out string resp);
+        HardwareParameters.GetParameter("TestDCFAlignment", out string resp, true);
 
         var lines = resp.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -37,21 +38,16 @@ public class Test
             {
                 string key = token[Handler.INDEX_ZERO];
                 resp = token[Handler.INDEX_ONE];
-                break;
+                if (resp.Contains(Handler.TestDCFAlignmentErrorResponse))
+                {
+                    result = resp.Trim();
+                    Logger.LogMessage(Level.Info, result);
+                    return true;
+                }
+                else continue;
             }
         }
 
-        if (resp == Handler.TestDCFAlignmentErrorResponse)
-        {
-            Logger.LogMessage(Level.Info, resp);
-            return true;
-        }
-        else if(resp != Handler.TestDCFAlignmentResponse)
-        {
-            Logger.LogMessage(Level.Error, Handler.TESTDCFAlignment_INVALID_RESPONSE);
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }
