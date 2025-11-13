@@ -28,8 +28,9 @@ public class Test
 
         if (SwitchToServiceLevel())
         {
-            if (TestFANFunctionality()) return true;
-            else return false;
+            TestFANFunctionality();
+            SwitchToUserLevel(); 
+            return true;
         }
         else return false;
     }
@@ -61,6 +62,39 @@ public class Test
             Logger.LogMessage(Level.Success, ServiceLevelParameterNames.ServiceCodeSuccess);
 
         return true;
+    }
+
+    private bool SwitchToUserLevel()
+    {
+        string lockState = null;
+
+        // Switch to User Mode from ServiceLevel
+        HardwareParameters.SetParameter(ServiceLevelParameterNames.ServiceLevelUserMode, Handler.Nothing);
+        HardwareParameters.GetParameter(ServiceLevelParameterNames.ServiceLevelUserMode, out lockState, true);
+
+        if (lockState.Length > 0)
+        {
+            var lines = lockState.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                var token = line.Split(Handler.DELIMITER);
+                if (token.Length > 0 && token[0] == ServiceLevelParameterNames.ServiceLock_Response)
+                {
+                    string key = token[0];
+                    lockState = token[1];
+                    Logger.LogMessage(Level.Info, $"Response for Service.Lock is {token[1]}");
+                    break;
+                }
+            }
+
+            if (lockState == ServiceLevelParameterNames.ServiceLockResult)
+            {
+                Logger.LogMessage(Level.Info, ServiceLevelParameterNames.UserMode);
+                return true;
+            }
+        }
+        return false;
     }
 
     private bool WaitForResponse(string parameterName, int timeoutMs, out string response)
@@ -134,9 +168,9 @@ public class Test
         // Define the three PWM cases using your existing constants
         var pwmCases = new[]
         {
-            new { Fan1Pwm = FanParameterNames.FAN1_PWM_1, Fan2Pwm = FanParameterNames.FAN2_PWM_1, Min = 50, Max = 100, Comparison = RangeComparison.Inclusive },
-            new { Fan1Pwm = FanParameterNames.FAN1_PWM_2, Fan2Pwm = FanParameterNames.FAN2_PWM_2, Min = 120, Max = 190, Comparison = RangeComparison.Inclusive },
-            new { Fan1Pwm = FanParameterNames.FAN1_PWM_3, Fan2Pwm = FanParameterNames.FAN2_PWM_3, Min = 210, Max = int.MaxValue, Comparison = RangeComparison.GreaterThan } // >240
+            new { Fan1Pwm = FanParameterNames.FAN1_PWM_1, Fan2Pwm = FanParameterNames.FAN2_PWM_1, Min = FanParameterNames.FAN_MIN_SPEED_1, Max = FanParameterNames.FAN_MAX_SPEED_1, Comparison = RangeComparison.Inclusive },
+            new { Fan1Pwm = FanParameterNames.FAN1_PWM_2, Fan2Pwm = FanParameterNames.FAN2_PWM_2, Min = FanParameterNames.FAN_MIN_SPEED_2, Max = FanParameterNames.FAN_MAX_SPEED_2, Comparison = RangeComparison.Inclusive },
+            new { Fan1Pwm = FanParameterNames.FAN1_PWM_3, Fan2Pwm = FanParameterNames.FAN2_PWM_3, Min = FanParameterNames.FAN_MIN_SPEED_3, Max = int.MaxValue, Comparison = RangeComparison.GreaterThan }
         };
 
         // Track pass/fail per PWM for each fan
