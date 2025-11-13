@@ -20,8 +20,8 @@ namespace Helper
         public const string LeftCAN_CMD_NMTSTART = "CanE0.NmtStart";
         public const string LeftCANConnector = "Left CAN Connector";
         public const string RIGHTCANConnector = "Right CAN Connector";
-        public const string LEFTCAN_CONNECTOR_FAILED = "Left CAN Connector Failed.";
-        public const string RIGHTCAN_CONNECTOR_FAILED = "Right CAN Connector Failed.";
+        public const string LEFTCAN_CONNECTOR_FAILED = "Left CAN connector: test failed - no reaction";
+        public const string RIGHTCAN_CONNECTOR_FAILED = "Right CAN connector: test failed - no reaction";
         public const string LEFTCAN_CONNECTOR_PASSED = "Left CAN Connector: test OK.";
         public const string RIGHTCAN_CONNECTOR_PASSED = "Right CAN Connector: test OK.";
         public const string CAN_TEST_COMPLETED = "Test Completed Successfully.";

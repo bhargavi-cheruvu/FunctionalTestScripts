@@ -18,7 +18,7 @@ public class Test
                 return false;
 
             //check Left CAN connector.
-            if (!TestLeftCANConnectorNode())//LEFTNODE))
+            if (!TestLeftCANConnectorNode())
             {
                 Logger.LogMessage(Level.Error, CANNodeParameters.LEFTCAN_CONNECTOR_FAILED);
                 return false;
@@ -28,7 +28,7 @@ public class Test
                 Logger.LogMessage(Level.Info, CANNodeParameters.LEFTCAN_CONNECTOR_PASSED);
             }
 
-            if (!TestRightCANConnectorNode())//RIGHTNODE))
+            if (!TestRightCANConnectorNode())
             {
                 Logger.LogMessage(Level.Error, CANNodeParameters.RIGHTCAN_CONNECTOR_FAILED);
                 return false;
@@ -48,85 +48,65 @@ public class Test
         }       
     }
 
-    public bool TestLeftCANConnectorNode()//byte nodeId)
+    public bool TestLeftCANConnectorNode()
     {
         SendNmtStop(0x11);
-        Wait(10.0); // increase the time to 2.0 from 1.0
+        Wait(CANNodeParameters.WaitTimeinSeconds);
 
         SendNmtStart(0x11);
-        if (!WaitReady(60.0)) return false; // increase the time to 10.0 from 5.0
-                
-        //    if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
-        //    if (!SendSdoSB(0x611, 0x6200, 0x01, 0x01)) return false;
-       
-        //    if (!SendSdoSW(0x612, 0x2014, 0x01, 0x0c00)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    if (!SendSdoSB(0x612, 0x2011, 0x01, 0xFF)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);       
+        if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
 
-        //    Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
-        //    if (!SendSdoSB(0x612, 0x6200, 0x01, 0x01)) return false;
-        
-        //if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
+        Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
+        SendNmtStop(0x11);
+        Wait(CANNodeParameters.WaitTimeinSeconds);
 
-        //Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
-        //SendNmtStop(nodeId);
-        //Wait(1.0);
+        SendNmtStop(0x11);
+        Wait(CANNodeParameters.WaitTimeinSeconds);
 
-        //if(!OnDeviceReebootGoto()) return false;
+        if (!OnDeviceReebootGoto()) return false;
 
-        //Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
-        //if(!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
+        Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
+        if (!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
 
         return true;
     }
 
     public bool TestRightCANConnectorNode()
     {
-        SendNmtStop(0x11);
-        Wait(10.0); // increase the time to 2.0 from 1.0
-
         SendNmtStop(0x12);
-        Wait(10.0); // increase the time to 2.0 from 1.0
+        Wait(CANNodeParameters.WaitTimeinSeconds);
 
         SendNmtStart(0x12);
-        if (!WaitReady(60.0)) return false; // increase the time to 10.0 from 5.0
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
+        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        //    Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
-        //    if (!SendSdoSB(0x611, 0x6200, 0x01, 0x01)) return false;
-      
-        //    if (!SendSdoSW(0x612, 0x2014, 0x01, 0x0c00)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
+        if (!SendSdoSB(0x612, 0x6200, 0x01, 0x01)) return false;
 
-        //    if (!SendSdoSB(0x612, 0x2011, 0x01, 0xFF)) return false;
-        //    if (!WaitReady(5.0)) return false;
+        if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
 
-        //    Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
-        //    if (!SendSdoSB(0x612, 0x6200, 0x01, 0x01)) return false;
-    
-        //if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
+        Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
+        SendNmtStop(0x12);
+        Wait(CANNodeParameters.WaitTimeinSeconds);
 
-        //Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
-        //SendNmtStop(nodeId);
-        //Wait(1.0);
+        if (!OnDeviceReebootGoto()) return false;
 
-        //if(!OnDeviceReebootGoto()) return false;
-
-        //Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
-        //if(!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
+        Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
+        if (!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
 
         return true;
     }
@@ -156,19 +136,19 @@ public class Test
 
     private void Wait(double seconds)
     {
-        Thread.Sleep((int)(seconds * 1000));
+        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds));
     }
 
     private bool WaitReady(double seconds)
     {
         Logger.LogMessage(Level.Info, $"Waiting for device ready for up to {seconds} seconds...");
-        Thread.Sleep((int)(seconds * 1000)); // Wait Time in milliseconds
+        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds)); // Wait Time in milliseconds
         return true;
     }
     private bool WaitReconnect(double seconds)
     {
         Logger.LogMessage(Level.Info, $"Waiting for Reconnection (USB loss detection) for up to {seconds} seconds...");
-        Thread.Sleep((int)(seconds * 1000)); // Wait Time in milliseconds
+        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds)); // Wait Time in milliseconds
         return true;
     }
 
