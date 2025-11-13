@@ -41,9 +41,9 @@ namespace Helper
         public const int ServiceCode = 87794;
         public const string ExpectedServiceCode = "1";
         public const string ServiceLockResult = "OK";
-        public const int TimeInterval = 1000;
+        public const int TimeInterval = 1000;       
     }
-   
+
     public class FanParameterNames
     {
         public const string FAN1_COMMAND = "Fan1Pwm";
@@ -55,8 +55,8 @@ namespace Helper
         public const string FAN1_SPEEDFROM_RESP = "~Fan1Speed";
         public const string FAN2_SPEEDFROM_RESP = "~Fan2Speed";
 
-        public const int FAN1_PWM_1 = -60; //-26;
-        public const int FAN2_PWM_1 = -60; //-26;
+        public const int FAN1_PWM_1 = -60;
+        public const int FAN2_PWM_1 = -60; 
         public const int FAN1_PWM_2 = -128;
         public const int FAN2_PWM_2 = -128;
         public const int FAN1_PWM_3 = -255;
@@ -71,13 +71,12 @@ namespace Helper
         public const int FAN_MAX_SPEED_1 = 100;
 
         // FAN Speed limits for FAN 1 and FAN 2, if FAN1pwm or FAN2pwm is -128
-        public const int FAN_MIN_SPEED_2 = 130;
+        public const int FAN_MIN_SPEED_2 = 120;
         public const int FAN_MAX_SPEED_2 = 190;
 
         // FAN Speed limits for FAN 1 and FAN 2, if FAN1pwm or FAN2pwm is -255
         public const int FAN_MIN_SPEED_3 = 210;
-        //public const int FAN_MAX_SPEED_3 = 300;
-
+       
         public const int WAITTIME = 1000;
         public const int WAITTIME_INMILLISECONDS = 10 * 1000;
         public const int SPEED_MULTIPLE_OFFSET = 15;
