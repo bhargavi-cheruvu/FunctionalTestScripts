@@ -94,6 +94,7 @@ public class Connection
                     messageToWrite = string.Format("{0}", parameter.Name);
 
                     WriteToUSB(messageToWrite, usbStream);
+                    Thread.Sleep(1000); // wait for device to process the command
                 return true;
             }
             return false;
