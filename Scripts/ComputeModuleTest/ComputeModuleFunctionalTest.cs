@@ -1,6 +1,7 @@
 ﻿using Helper;
 using LogViewManager;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
@@ -16,38 +17,68 @@ public class Test
 
         Logger.LogMessage(Level.Info, Handler.ComputeModuleTest);
 
-        if(ComputeModuleResponse())
+        if (ComputeModuleResponse())
         {
             return true;
         }
         return false;
     }
-
+    
     public bool ComputeModuleResponse()
     {
         string result = string.Empty;
+        Thread.Sleep(2000);
         HardwareParameters.SetParameter("TestDCFAlignment", "");
-        HardwareParameters.GetParameter("TestDCFAlignment", out string resp, true);
 
-        var lines = resp.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+        const int totalTimeoutMs = 3000; // poll for 1 second total
+        const int pollIntervalMs = 50;   // poll every 50ms
+        var sw = Stopwatch.StartNew();
 
-        foreach (string line in lines)
+        while (sw.ElapsedMilliseconds < totalTimeoutMs)
         {
-            var token = line.Split(Handler.DELIMITER);
-            if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == Handler.TestDCFAlignment_STATUS)
+            // read current response from hardware parameter
+            HardwareParameters.GetParameter("TestDCFAlignment", out string resp, true);
+
+            if (!string.IsNullOrEmpty(resp))
             {
-                string key = token[Handler.INDEX_ZERO];
-                resp = token[Handler.INDEX_ONE];
-                if (resp.Contains(Handler.TestDCFAlignmentErrorResponse))
+                var lines = resp.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in lines)
                 {
-                    result = resp.Trim();
-                    Logger.LogMessage(Level.Info, result);
-                    return true;
+                    var token = line.Split(Handler.DELIMITER);
+
+                    // Ensure we have at least two tokens before accessing INDEX_ONE
+                    if (token.Length > Handler.INDEX_ONE && token[Handler.INDEX_ZERO] == Handler.TestDCFAlignment_STATUS)
+                    {
+                        resp = token[Handler.INDEX_ONE];
+                        if (resp.Contains(Handler.TestDCFAlignmentErrorResponse))
+                        {
+                            result = resp.Trim();
+                            Logger.LogMessage(Level.Info, result);
+                            return true;
+                        }
+                    }
+
+                    if (token.Length > Handler.INDEX_ONE && token[Handler.INDEX_ZERO] == "~TestDCFAlignment")
+                    {
+                        resp = token[Handler.INDEX_ONE];
+                        if (resp.Contains(Handler.TestDCF_MissingTestAdapter))
+                        {
+                            result = resp.Trim();
+                            Logger.LogMessage(Level.Error, result);
+                            return false;
+                        }
+                    }
                 }
-                else continue;
             }
+
+            if (ScriptHelper.CheckIfProcedureIsCancelled())
+                return false;
+
+            Thread.Sleep(pollIntervalMs);
         }
 
+        // timed out after 1 second without matching conditions
         return false;
     }
 }
