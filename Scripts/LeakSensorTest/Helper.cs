@@ -37,6 +37,7 @@ namespace Helper
         public const string MUTE_ALARM_RESP = "~MuteAlarm";
         public const string ExpectedResult = "OK";
         public const int ReactionTime_AfterApplyingWater = 20000;
+        public const string Dry_LeakSensor = "Leak";
         public const string Dry_LeakSensor_Resp = "~Leak";
         public const string Dry_LeakSensor_ExpectedResp = "0";
         public const int TimeInterval_DryLeakSensor = 30000;      
