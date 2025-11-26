@@ -258,6 +258,16 @@ public class Test
         bool allFan1Passed = fan1Passes.TrueForAll(x => x);
         bool allFan2Passed = fan2Passes.TrueForAll(x => x);
 
+        if(!allFan1Passed)
+        {
+            Logger.LogMessage(Level.Error, "FAN1 not connected or FAN test FAILED for FAN1.");
+        }
+
+        if (!allFan2Passed)
+        {
+            Logger.LogMessage(Level.Error, "FAN2 not connected or FAN test FAILED for FAN2.");
+        }
+
         if (IsSecondFANExists)
         {
             if (allFan1Passed && allFan2Passed)
@@ -267,10 +277,10 @@ public class Test
             }
             else
             {
-                Logger.LogMessage(Level.Error, "FAN test FAILED. Not all PWM cases passed for both fans.");
+                //Logger.LogMessage(Level.Error, "FAN test FAILED. Not all PWM cases passed for both fans.");
                 return false;
             }
-        }
+        }        
         else
         {
             if (allFan1Passed)
