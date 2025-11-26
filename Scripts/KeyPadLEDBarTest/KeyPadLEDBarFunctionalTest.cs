@@ -1,5 +1,4 @@
 ﻿using Helper;
-//using KeyPadLEDBarTest;
 using LogViewManager;
 using System;
 using System.Collections.Generic;
