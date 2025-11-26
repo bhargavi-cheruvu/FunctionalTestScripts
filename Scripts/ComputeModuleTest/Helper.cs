@@ -22,6 +22,8 @@ namespace Helper
         public const string TestDCFAlignment_STATUS = "~Err";
         public const string TestDCFAlignmentResponse = "OK";
         public const string TestDCFAlignmentErrorResponse = "DCF Alignment Test has completed. Code 4257.";
+        public const string TestDCF_MissingTestAdapter = "Improper or missing test adapter or CPU board alignment failure. Code 4254.";
         public const string TESTDCFAlignment_INVALID_RESPONSE = "Invalid Response";
+        public const int ComputeModule_WaitTime = 1000;
     }    
 }
