@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Main Node-->
-<FunctionalTests>
+<FunctionalTests LocalVersion="1.1.1.1">
 	<!-- Sub Node - Appears at top of GUI - Attributes: Name (string)-->
 	<FunctionalTest Name="Functional Test Suite">
 		<!-- App Configuration Node: Basic Settings, Possible Sub Nodes: SerialNumberSettings, MonitorSettings, ResultSettings-->
@@ -32,10 +32,10 @@
 		<Tests>
 			<!-- Test Node: Information about the tests, which are supposed to be performed (script allowed as *.cs and *.dll) -->
 			<!-- Attributes: Name (string), Script (string) -->
-			<!--<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>-->
-			<Test Name="Digital I/O Test" Script="DigitalIOTest.dll"/>
-			<Test Name="FAN Test" Script="FANTest.dll"/>
+			<Test Name="Service Level Test" Script="ServiceLevelTest.dll"/>
+			<Test Name="Digital I/O Test" Script="DigitalIOTest.dll"/>			
 			<Test Name="Compute Module Alignment Test" Script="ComputeModuleTest.dll"/>
+			<Test Name="FAN Test" Script="FANTest.dll"/>
 			<Test Name="USB Hub Test" Script="USBHubTest.dll"/>
 			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
 			<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
