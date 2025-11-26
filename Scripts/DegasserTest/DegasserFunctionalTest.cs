@@ -1,6 +1,7 @@
 ﻿using Helper;
 using LogViewManager;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters;
@@ -99,7 +100,7 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             if (!string.IsNullOrEmpty(response))
                 return true;
 
@@ -118,7 +119,7 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             // Parse and Validate for Service Challenge and Service code values.           
             var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -345,66 +346,158 @@ public class Test
     {
         // Send to Pump Module
         HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_CMD, Handler.INDEX_ONE);
-        Thread.Sleep(DegasserParameterNames.WAITTIME_TWO_MINS); //wait for atleast 2 min's
-        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response1);
-        Thread.Sleep(DegasserParameterNames.WAITTIME_ONE_MIN); // monitor for 1 min
-        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response2);
-        Thread.Sleep(DegasserParameterNames.WAITTIME_THIRTY_SECONDS); // outputs over 30 seconds.
 
-        //Interact with the GMH3x32.dll and read the vaccum meter value (external value).
-        // Read COMPORT
-        ReadCOMPorts();
-        MessageBox.Show(" " + COMPortVal, "Degasser");
+        // Wait for at least 2 minutes for the pump to react
+        Thread.Sleep(DegasserParameterNames.WAITTIME_TWO_MINS);
 
-        // Read out external pressure sensor
-        double externalValue = ReadCurrentDisplayValue();
-        MessageBox.Show(" " + externalValue, "Degasser");
-        // Get the Parameter value from the response2.
-        double Value = ExtractDegasserPressureVal(response2);
+        // Monitor ~Degasser.Pressure for stability (timeout 1 minute, allowed deviation +/-0.5 mbar)
+        const double allowedDeviationMbar = 0.5; // mbar
+        const double scalePerCountMbar = 0.01; // 1 count = 0.01 mbar
+        int allowedDeviationCounts = (int)Math.Round(allowedDeviationMbar / scalePerCountMbar); // =50 counts
 
-        // Calculate <offset> = <external_value> - <value>
-        double Offset = externalValue - Value;   // Resolution: 0.01 mbar
+        Logger.LogMessage(Level.Info, "Monitoring degasser pressure for stability...");
 
-        // Set the Degasser.Pressure.Offset=<offset>
-        //Degasser.Pressure.Offset
-        HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, Offset);
+        List<int> samples = new List<int>();
+        int monitorTimeoutMs = DegasserParameterNames.WAITTIME_ONE_MIN; // 1 minute
+        int sampleIntervalMs = 1000; // sample every 1 second
+        int elapsed = 0;
+        bool stable = false;
+        int stableValueCounts = 0;
 
-        // Get the Degasser.Pressure.Offset=<offset>
-        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, out string pressureOffset);
+        while (elapsed < monitorTimeoutMs)
+        {
+            HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response, true);
+            int valCounts = (int)Math.Round(ExtractDegasserPressureVal(ResponseSafe(response)));
+            samples.Add(valCounts);
 
-        // Get the ~Degasser.Pressure=<value>
-        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string pressureVal);
+            // evaluate stability over collected samples
+            int min = int.MaxValue, max = int.MinValue;
+            foreach (var v in samples)
+            {
+                if (v < min) min = v;
+                if (v > max) max = v;
+            }
 
-        // Need to check <external_value> is within limits
+            if (samples.Count >= 3 && (max - min) <= allowedDeviationCounts)
+            {
+                stable = true;
+                stableValueCounts = (int)Math.Round(Average(samples));
+                Logger.LogMessage(Level.Info, $"Pressure stabilized (counts). Min={min}, Max={max}, Avg={stableValueCounts}");
+                break;
+            }
+
+            Thread.Sleep(sampleIntervalMs);
+            elapsed += sampleIntervalMs;
+        }
+
+        if (!stable)
+        {
+            Logger.LogMessage(Level.Error, "Degasser pressure did not stabilize within timeout.");
+            return -1;
+        }
+
+        // When stable, average property outputs over 30 seconds
+        Logger.LogMessage(Level.Info, "Averaging degasser pressure over 30 seconds...");
+        samples.Clear();
+        int averagingDurationMs = DegasserParameterNames.WAITTIME_THIRTY_SECONDS; // 30 seconds
+        elapsed = 0;
+        while (elapsed < averagingDurationMs)
+        {
+            HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string response, true);
+            int valCounts = (int)Math.Round(ExtractDegasserPressureVal(ResponseSafe(response)));
+            samples.Add(valCounts);
+            Thread.Sleep(sampleIntervalMs);
+            elapsed += sampleIntervalMs;
+        }
+        double averageCounts = Average(samples);
+        double averageMbar = averageCounts * scalePerCountMbar;
+        Logger.LogMessage(Level.Info, $"Averaged degasser pressure: {averageCounts} counts = {averageMbar:F2} mbar");
+
+        // Read external pressure sensor and calculate offset
+        ReadCOMPorts(); // ensure COM is open and GMH configured
+        double externalMbar = ReadCurrentDisplayValue();
+        Logger.LogMessage(Level.Info, $"External sensor reading = {externalMbar:F2} mbar");
+
+        double offsetMbar = externalMbar - averageMbar; // resolution 0.01 mbar
+        offsetMbar = Math.Round(offsetMbar, 2);
+
+        // Set Degasser.Pressure.Offset=<offset>
+        HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, offsetMbar);
+        Logger.LogMessage(Level.Info, "Set Degasser pressure offset to " + offsetMbar);
+
+        // Read back offset and pressure from device
+        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, out string pressureOffsetResp, true);
+        double readBackOffset = ExtractDegasserPressureOffsetVal(ResponseSafe(pressureOffsetResp));
+        Logger.LogMessage(Level.Info, "Read back Degasser.Pressure.Offset = " + readBackOffset);
+
+        HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string pressureResp, true);
+        double readBackCounts = ExtractDegasserPressureVal(ResponseSafe(pressureResp));
+        double readBackMbar = readBackCounts * scalePerCountMbar;
+        Logger.LogMessage(Level.Info, $"Read back Degasser.Pressure = {readBackCounts} counts = {readBackMbar:F2} mbar");
+
+        // Check: must match external_value within limits (±0.5 mbar)
+        double diff = Math.Abs(externalMbar - readBackMbar);
+        if (diff > allowedDeviationMbar)
+        {
+            Logger.LogMessage(Level.Error, $"Degasser pressure ({readBackMbar:F2} mbar) does not match external sensor ({externalMbar:F2} mbar) within ±{allowedDeviationMbar} mbar. Diff={diff:F2} mbar");
+            return -1;
+        }
 
         // Check <value> against range 8000..15000 cts.
+        const int minCounts = 8000;
+        const int maxCounts = 15000;
+        if (readBackCounts < minCounts || readBackCounts > maxCounts)
+        {
+            Logger.LogMessage(Level.Error, $"Degasser pressure counts {readBackCounts} out of allowed range {minCounts}..{maxCounts}.");
+            return -1;
+        }
 
-        // Stabilization: pressure +/- 0.5 mbar (to be verified)
-        // Limits: pressure +/ -0.5 mbar(to be verified)
-
-        // Convert pressureVal to integer and Stabilize
-        double pVal = ExtractDegasserPressureVal(pressureVal);
-        return CheckStabilizationPressureValue(pVal);
+        // Return the averaged pressure in counts as success (>0)
+        return averageCounts;
     }
        
     private static double ExtractDegasserPressureVal(string Response)
     {
-        if (Response != null)     
+        if (string.IsNullOrEmpty(Response))
+            return 0.0;
+
+        var lines = Response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string line in lines)
         {
-            var lines = Response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+            var token = line.Split(Handler.DELIMITER);
 
-            foreach (string line in lines)
+            // check for Degasser pressure Reponse                
+            if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == DegasserParameterNames.DEGASSER_PRESSURE_VAL)
             {
-                var token = line.Split(Handler.DELIMITER);
-
-                // check for Degasser pressure Reponse                
-                if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == DegasserParameterNames.DEGASSER_PRESSURE_VAL)
+                string valStr = token[Handler.INDEX_ONE];
+                if (double.TryParse(valStr, out double Value))
                 {
-                    string key = token[Handler.INDEX_ZERO];
-                    Response = token[Handler.INDEX_ONE];
+                    // Response is in counts
+                    return Value;
+                }
+            }
+        }
+        return 0.0;
+    }
 
-                    double Value = Convert.ToInt32(Response);
-                    return Value;              
+    private static double ExtractDegasserPressureOffsetVal(string Response)
+    {
+        if (string.IsNullOrEmpty(Response))
+            return 0.0;
+
+        var lines = Response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string line in lines)
+        {
+            var token = line.Split(Handler.DELIMITER);
+           
+            if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == DegasserParameterNames.DEGASSER_PRESSURE_OFFSET_VAL)
+            {
+                string valStr = token[Handler.INDEX_ONE];
+                if (double.TryParse(valStr, out double Value))
+                {
+                    return Value; // offset in mbar (expected)
                 }
             }
         }
@@ -413,8 +506,22 @@ public class Test
 
     private double CheckStabilizationPressureValue(double degasserPressureVal)
     {
+        // Not used for new algorithm; kept for backward compatibility
         // Stabilization could be speed property value +/- 0.5
         degasserPressureVal += 0.5;      
         return degasserPressureVal;
+    }
+
+    private static string ResponseSafe(string resp)
+    {
+        return resp ?? string.Empty;
+    }
+
+    private static double Average(List<int> samples)
+    {
+        if (samples == null || samples.Count == 0) return 0.0;
+        double sum = 0;
+        foreach (var s in samples) sum += s;
+        return sum / samples.Count;
     }
 }
