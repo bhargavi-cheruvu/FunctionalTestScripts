@@ -65,7 +65,7 @@ public class Test
         
         // Send MuteAlarm
         HardwareParameters.SetParameter(LeakSensorParameters.MUTE_ALARM, Handler.Nothing);
-        HardwareParameters.GetParameter(LeakSensorParameters.MUTE_ALARM, out MuteAlarmState);
+        HardwareParameters.GetParameter(LeakSensorParameters.MUTE_ALARM, out MuteAlarmState, true);
 
         if (MuteAlarmState.Length > 0)
         {
@@ -91,7 +91,7 @@ public class Test
         if(MessageBox.Show($"Dry the Leak Sensor", "Leak Sensor", MessageBoxButtons.YesNo) == DialogResult.Yes)
         {
             //~Leak=0
-            if(!WaitForExpectedResponse(LeakSensorParameters.Dry_LeakSensor_Resp, 
+            if(!WaitForExpectedResponse(LeakSensorParameters.Dry_LeakSensor, 
                 LeakSensorParameters.Dry_LeakSensor_ExpectedResp,
                 LeakSensorParameters.TimeInterval_DryLeakSensor))
             {
@@ -111,7 +111,7 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             if (!string.IsNullOrEmpty(response))
                 return true;
 
@@ -131,14 +131,14 @@ public class Test
 
         while (elapsed < timeoutMs)
         {
-            HardwareParameters.GetParameter(parameterName, out response);
+            HardwareParameters.GetParameter(parameterName, out response, true);
             // Parse and Validate for Leak Sensor calibrate and Leak Sensor CalibrateOffset values.           
             var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string line in lines)
             {
                 var token = line.Split(Handler.DELIMITER);
-                if (token.Length > 0 && token[0] == ServiceLevelParameterNames.ValidateServiceCode)
+                if (token.Length > 0 && token[0] == LeakSensorParameters.Dry_LeakSensor_Resp)
                 {
                     string key = token[0];
                     response = token[1];
