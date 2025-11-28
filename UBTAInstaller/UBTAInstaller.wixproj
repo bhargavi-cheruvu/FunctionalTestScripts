@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="WixToolset.Sdk/4.0.3">
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="$(SolutionDir)\UBTAGenerateInstaller\bin\Debug\net6.0\UBTAGenerateInstaller.exe $(ProjectDir)" />
+    <Exec Command="$(SolutionDir)UBTAGenerateInstaller\bin\Debug\net6.0\UBTAGenerateInstaller.exe $(ProjectDir)" />
   </Target>
   <ItemGroup>
     <PackageReference Include="WixToolset.Heat" Version="4.0.3" />
