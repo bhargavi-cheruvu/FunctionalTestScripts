@@ -26,13 +26,15 @@ public class Test
         // switch to Service Level.
         Logger.LogMessage(Level.Info, Handler.StartServiceLevelTest);
 
+        bool result = false;
+
         if (SwitchToServiceLevel())
         {
-            TestFANFunctionality();
-            SwitchToUserLevel(); 
-            return true;
+            result = TestFANFunctionality();
         }
-        else return false;
+
+        SwitchToUserLevel();
+        return result;
     }
 
     public bool SwitchToServiceLevel()
@@ -156,8 +158,7 @@ public class Test
         return false;
     }
 
-    /// <summary>
-    /// Main fan test logic updated:
+    /// <summary>    
     /// - Runs three PWM cases (-60, -128, -255)
     /// - Validates fan speed ranges as requested
     /// - Detects fan2 existence after the first PWM read (fan2 speed > 10)
@@ -242,7 +243,7 @@ public class Test
             else
             {
                 // If fan2 doesn't exist, record true so the "all cases pass" for fan2 does not block final result
-                fan2Passes.Add(true);
+                fan2Passes.Add(false);
             }
 
             // small delay before next case
@@ -258,15 +259,25 @@ public class Test
         bool allFan1Passed = fan1Passes.TrueForAll(x => x);
         bool allFan2Passed = fan2Passes.TrueForAll(x => x);
 
-        if(!allFan1Passed)
+        
+
+        /////////////////////////////////////
+        if (!allFan1Passed && !allFan2Passed)
+        {
+            Logger.LogMessage(Level.Error, "FAN1 & FAN2 are not connected or FAN test FAILED for FAN1 & FAN2.");
+            return false;
+        }
+        else if (!allFan1Passed)
         {
             Logger.LogMessage(Level.Error, "FAN1 not connected or FAN test FAILED for FAN1.");
+            return false;
         }
-
-        if (!allFan2Passed)
+        else if (!allFan2Passed)
         {
             Logger.LogMessage(Level.Error, "FAN2 not connected or FAN test FAILED for FAN2.");
+            return false;
         }
+        /////////////////////////////////////
 
         if (IsSecondFANExists)
         {
@@ -274,13 +285,13 @@ public class Test
             {
                 Logger.LogMessage(Level.Success, "FAN test PASSED for both FAN1 and FAN2 (all three PWM cases).");
                 return true;
-            }
+            }            
             else
             {
                 //Logger.LogMessage(Level.Error, "FAN test FAILED. Not all PWM cases passed for both fans.");
                 return false;
             }
-        }        
+        }
         else
         {
             if (allFan1Passed)
