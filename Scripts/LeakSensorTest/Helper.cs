@@ -32,15 +32,20 @@ namespace Helper
         public const string LEAKSENSOR_CALIBRATE_RESP = "~LeakSensor.Calibrate";
         public const string NoResponseFromDevice = "No response from device for LeakSensor.Calibrate";
         public const string LEAKSENSOR_CALIBRATE_OFFSET = "LeakSensor.CalibOffset";
+        public const string LEAKSENSOR_CALIBRATE_OFFSET_VAL = "~LeakSensor.CalibOffset";
         public const int TimeInterval = 1000;
         public const string MUTE_ALARM = "MuteAlarm";
         public const string MUTE_ALARM_RESP = "~MuteAlarm";
         public const string ExpectedResult = "OK";
-        public const int ReactionTime_AfterApplyingWater = 20000;
+        public const int ReactionTime_AfterApplyingWater = 60000;
         public const string Dry_LeakSensor = "Leak";
         public const string Dry_LeakSensor_Resp = "~Leak";
         public const string Dry_LeakSensor_ExpectedResp = "0";
-        public const int TimeInterval_DryLeakSensor = 30000;      
+        public const int TimeInterval_DryLeakSensor = 30000;
+        public const int MinExpectedLeakValue = 300;
+        public const string Err_LeakError = "~Err";
+        public const string LeakErrorResponse = "!generic,1,33,\"Leak detected - eliminate within approx. 180 seconds. Code 33.\",I,180";
+        public const string LeakErrorResponse_1 = "!generic,1,33,\"Leak detected - eliminate within approx. 150 seconds. Code 33.\",I,150";
     }
 
     public class ServiceLevelParameterNames
