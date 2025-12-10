@@ -63,6 +63,8 @@ public class Test
         if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
         Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);       
+        if (!SendSdoSB(0x611, 0x6200, 0x01, 0x01)) return false;
+
         if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
 
         Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
@@ -88,10 +90,10 @@ public class Test
         SendNmtStart(0x12);
         if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
+        if (!SendSdoSW(0x612, 0x2014, 0x01, 0x0c00)) return false;
         if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
-        if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
+        if (!SendSdoSB(0x612, 0x2011, 0x01, 0xFF)) return false;
         if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
 
         Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
@@ -124,15 +126,18 @@ public class Test
     }
     private bool SendSdoSW(int nodeId, ushort index, byte subIndex, int Val)
     {
+        HardwareParameters.SetParameter("CanE0.SdoSW", nodeId);
         Logger.LogMessage(Level.Info, $"SDO WriteWord to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X4}");
         return true;
     }
 
     private bool SendSdoSB(int nodeId, ushort index, byte subIndex, byte Val)
     {
+        HardwareParameters.SetParameter("CanE0.SdoSB", nodeId);
         Logger.LogMessage(Level.Info, $"SDO WriteByte to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X2}");
         return true;
     }
+
 
     private void Wait(double seconds)
     {
