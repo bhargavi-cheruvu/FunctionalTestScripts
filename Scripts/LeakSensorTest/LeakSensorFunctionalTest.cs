@@ -149,7 +149,7 @@ public class Test
         }
 
         // 6. Ask user to dry the leak sensor
-        if (MessageBox.Show((IWin32Window)this, "Dry the Leak Sensor",
+        if (MessageBox.Show("Dry the Leak Sensor",
                             "Leak Sensor",
                             MessageBoxButtons.YesNo) != DialogResult.Yes)
             return Fail("User did not dry the leak sensor.");
