@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
 using UniversalBoardTestApp;
-using System.Drawing;
+using System.Windows.Forms;
 public class Test
 {
     // Version of the script. Gets displayed in database/protocol
@@ -41,13 +41,6 @@ public class Test
         // 1. Send Calibrate
         HardwareParameters.SetParameter(LeakSensorParameters.LEAKSENSOR_CALIBRATE, Handler.Nothing);
 
-        //  waiting for 10 seconds for calibration to complete.
-        if (!WaitForCalibExpectedResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE, "OK", 10000))
-        {
-            Logger.LogMessage(Level.Error, LeakSensorParameters.NoResponseFromDevice);
-            return false;
-        }
-
         // 2. Read calibration offset
         HardwareParameters.SetParameter(LeakSensorParameters.LEAKSENSOR_CALIBRATE_OFFSET, Handler.REQUEST);
 
@@ -70,10 +63,17 @@ public class Test
             }
         }
 
+        //  waiting for 10 seconds for calibration to complete.
+        if (!WaitForCalibExpectedResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE, "OK", 10000))
+        {
+            Logger.LogMessage(Level.Error, LeakSensorParameters.NoResponseFromDevice);
+            return false;
+        }
+
         // 3. Ask user to apply water
-        if (MessageBox.Show("Apply 20 ml water to the Leak Sensor",
+        if (TopMostMessageBox.Show("Apply 20 ml water to the Leak Sensor",
                             "Leak Sensor",
-                            MessageBoxButtons.OKCancel) != DialogResult.OK)
+                            MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK) 
             return Fail("User cancelled: did not apply water.");
 
         // Allow stabilization
@@ -149,9 +149,9 @@ public class Test
         }
 
         // 6. Ask user to dry the leak sensor
-        if (MessageBox.Show("Dry the Leak Sensor",
+        if (TopMostMessageBox.Show("Dry the Leak Sensor",
                             "Leak Sensor",
-                            MessageBoxButtons.YesNo) != DialogResult.Yes)
+                            MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
             return Fail("User did not dry the leak sensor.");
 
         if (!WaitForExpectedResponse(LeakSensorParameters.Dry_LeakSensor,
@@ -171,30 +171,14 @@ public class Test
         foreach (var line in lines)
         {
             var token = line.Split(Handler.DELIMITER);
-            if (token.Length > 1 && token[0] == LeakSensorParameters.Dry_LeakSensor_Resp)//LEAKSENSOR_CALIBRATE_OFFSET_VAL)
+            if (token.Length > 1 && token[0] == LeakSensorParameters.Dry_LeakSensor_Resp)
             {
                 int val = Convert.ToInt32(token[1]);
                 return val;
             }
         }
-
         return 0;
     }
-
-    private string ParseMuteAlarmResponse(string muteResponse)
-    {
-        var lines = muteResponse.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN },
-                                       StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var line in lines)
-        {
-            var token = line.Split(Handler.DELIMITER);
-            if (token.Length > 1 && token[0] == LeakSensorParameters.MUTE_ALARM_RESP)
-                return token[1];
-        }
-
-        return string.Empty;
-    }   
 
     private bool WaitForResponse(string parameterName, int timeoutMs, out string response)
     {
@@ -211,7 +195,6 @@ public class Test
             Thread.Sleep(interval);
             elapsed += interval;
         }
-
         response = null;
         return false;
     }
@@ -283,4 +266,20 @@ public class Test
 
         return false;
     }
+}
+
+public static class TopMostMessageBox
+{
+    public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+    {
+        using (Form topMostForm = new Form { TopMost = true, ShowInTaskbar = false, Visible = false })
+        {
+            return MessageBox.Show(topMostForm, text, caption, buttons, icon);
+        }
+    }
+
+    public static DialogResult Show(string text, string caption)
+    {
+        return Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.None);
+    }    
 }
