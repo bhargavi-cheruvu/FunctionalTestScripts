@@ -79,91 +79,7 @@ public class Test
         // Allow stabilization
         Thread.Sleep(LeakSensorParameters.ReactionTime_AfterApplyingWater);
 
-        //// 4. Now confirm that water was actually applied        
-        //if (!WaitForResponse(LeakSensorParameters.LEAKSENSOR_CALIBRATE_OFFSET,
-        //                     1000,
-        //                     out string waterReply))
-        //    return Fail("Timeout: No leak detected within 60 seconds.");
-
-        //// Parse actual integer value
-        //int leakVal = ParseLeakValue(waterReply);
-
-        //if (leakVal ==0)
-        //    return Fail($"Water not detected – value too low: {leakVal}");
-
-        //Logger.LogMessage(Level.Info, $"Water detected successfully. Leak value = {leakVal}");
-
-        //// retreive the offset value.  Expected Alarm = 1 and err.
-        //lines = waterReply.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
-
-        //foreach (string line in lines)
-        //{
-        //    var token = line.Split(Handler.DELIMITER);
-        //    if (token.Length > 0 && token[0] == "~Alarm")
-        //    {
-        //        string key = token[0];
-        //        calibOffSetVal = token[1];
-        //        Logger.LogMessage(Level.Info, $"LeakSensor - Alarm : {calibOffSetVal}");
-        //       // break;
-        //    }
-        //    if (token.Length > 0 && token[0] == "~Err")
-        //    {
-        //        string key = token[0];
-        //        calibOffSetVal = token[1];
-        //        if(calibOffSetVal == null)
-        //            Logger.LogMessage(Level.Info, $"LeakSensor - Error : {calibOffSetVal}");      
-        //    }
-        //}
-
-        //// 5. Mute alarm
-        //if (leakVal == 1)
-        //{
-        //    HardwareParameters.SetParameter(LeakSensorParameters.Dry_LeakSensor, "?");
-        //    HardwareParameters.GetParameter(LeakSensorParameters.Dry_LeakSensor, out string dryState, true);
-
-        //    // retreive the offset value.
-        //    lines = dryState.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
-
-        //    foreach (string line in lines)
-        //    {
-        //        var token = line.Split(Handler.DELIMITER);
-        //        if (token.Length > 0 && token[0] == LeakSensorParameters.Dry_LeakSensor_Resp)
-        //        {
-        //            string key = token[0];
-        //            calibOffSetVal = token[1];
-        //            Logger.LogMessage(Level.Info, $"LeakSensor - ~Leak : {calibOffSetVal}");
-        //        }
-        //        if (token.Length > 0 && token[0] == "~Alarm")
-        //        {
-        //            string key = token[0];
-        //            calibOffSetVal = token[1];
-        //            Logger.LogMessage(Level.Info, $"LeakSensor - ~Alarm : {calibOffSetVal}");                   
-        //        }
-        //        if (token.Length > 0 && token[0] == "~MuteAlarm")
-        //        {
-        //            string key = token[0];
-        //            calibOffSetVal = token[1];
-        //            Logger.LogMessage(Level.Info, $"LeakSensor - ~MuteAlarm : {calibOffSetVal}");
-        //        }
-        //    }
-        //}
-
-        //// 6. Ask user to dry the leak sensor
-        //if (TopMostMessageBox.Show("Dry the Leak Sensor",
-        //                    "Leak Sensor",
-        //                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
-        //    return Fail("User did not dry the leak sensor.");
-
-        //if (!WaitForExpectedResponse(LeakSensorParameters.Dry_LeakSensor,
-        //                             LeakSensorParameters.Dry_LeakSensor_ExpectedResp,
-        //                             LeakSensorParameters.TimeInterval_DryLeakSensor))
-        //    return Fail("Leak Sensor still wet after 30 seconds.");
-
-        //Logger.LogMessage(Level.Info, "Leak Sensor calibration completed successfully.");
-        //return true;
-
-        // 4. Now confirm that water was actually applied        
-        // Replace old WaitForResponse with high-frequency alarm detection
+        // 4. Now confirm that water was actually applied
         if (!WaitForLeakAlarm(out string waterReply))
             return Fail("Timeout: No leak alarm detected within 60 seconds.");
 
@@ -174,8 +90,7 @@ public class Test
 
         Logger.LogMessage(Level.Info, $"Water detected successfully. Leak value = {leakVal}");
 
-
-        // --- NEW: Immediately (<0.5 sec) mute alarm when triggered ---
+        // trigger the mute alarm command within 0.5s of leak detection
         HardwareParameters.SetParameter(LeakSensorParameters.MUTE_ALARM, Handler.Nothing);
         Logger.LogMessage(Level.Info, "MuteAlarm command sent (<0.5s after alarm).");
 
@@ -184,22 +99,6 @@ public class Test
             Logger.LogMessage(Level.Error, "No Response for MUTEALARM from the device");
             return false;
         }
-
-        //HardwareParameters.GetParameter(LeakSensorParameters.MUTE_ALARM, out muteState, true);
-
-        //lines = muteState.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
-
-        //foreach (string line in lines)
-        //{
-        //    var token = line.Split(Handler.DELIMITER);           
-        //    if (token.Length > 0 && token[0] == "~MuteAlarm")
-        //    {
-        //        string key = token[0];
-        //        calibOffSetVal = token[1];
-        //        Logger.LogMessage(Level.Info, $"LeakSensor - ~MuteAlarm : {calibOffSetVal}");
-        //    }
-        //}
-
         // 6. Ask user to dry the leak sensor
         if (TopMostMessageBox.Show("Dry the Leak Sensor",
                             "Leak Sensor",
@@ -207,14 +106,13 @@ public class Test
             return Fail("User did not dry the leak sensor.");
 
 
-        // --- NEW: Wait until leak returns to 0 (stop immediately <0.5s) ---
+        // Wait until leak returns to 0 (stop immediately <0.5s)
         if (!WaitForLeakToClear())
             return Fail("Leak Sensor still wet after 30 seconds.");
 
         Logger.LogMessage(Level.Info, "Leak Sensor dry detected immediately (<0.5s).");
         Logger.LogMessage(Level.Info, "Leak Sensor calibration completed successfully.");
         return true;
-
     }
 
     private int ParseLeakValue(string msg)
@@ -252,41 +150,7 @@ public class Test
         response = null;
         return false;
     }
-
-    private bool WaitForExpectedResponse(string parameterName, string expectedValue, int timeoutMs)
-    {
-        int elapsed = 0;
-        int interval = 300;
-        string response;
-
-        while (elapsed < timeoutMs)
-        {
-            HardwareParameters.GetParameter(parameterName, out response, true);
-            // Parse and Validate for Leak Sensor calibrate and Leak Sensor CalibrateOffset values.           
-            var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string line in lines)
-            {
-                var token = line.Split(Handler.DELIMITER);
-                if (token.Length > 0 && token[0] == LeakSensorParameters.Dry_LeakSensor_Resp)
-                {
-                    string key = token[0];
-                    response = token[1];
-                    Logger.LogMessage(Level.Info, $"~Leak : {response}");
-                    break;
-                }               
-            }
-
-            if (!string.IsNullOrEmpty(response) && response == expectedValue)
-                return true;
-
-            Thread.Sleep(interval);
-            elapsed += interval;
-        }
-
-        return false;
-    }
-
+    
     private bool WaitForMUTEALARMResponse(string parameterName, string expectedValue, int timeoutMs)
     {
         int elapsed = 0;
@@ -320,8 +184,6 @@ public class Test
 
         return false;
     }
-
-
     private bool WaitForCalibExpectedResponse(string parameterName, string expectedValue, int timeoutMs)
     {
         int elapsed = 0;
@@ -356,7 +218,7 @@ public class Test
         return false;
     }
 
-    // Detect alarm as quickly as possible
+    // Detect alarm 
     private bool WaitForLeakAlarm(out string response)
     {
         int timeoutMs = 60000;
@@ -385,7 +247,7 @@ public class Test
     }
 
 
-    // Detect when leak becomes 0 again
+    // Detect when leak becomes 0 
     private bool WaitForLeakToClear()
     {
         int timeoutMs = 30000;
@@ -421,7 +283,6 @@ public static class TopMostMessageBox
             return MessageBox.Show(topMostForm, text, caption, buttons, icon);
         }
     }
-
     public static DialogResult Show(string text, string caption)
     {
         return Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.None);
