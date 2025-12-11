@@ -56,5 +56,7 @@ namespace Helper
         public const int SPEED_MULTIPLE_OFFSET = 15;
         public const string DEGASSER_PRESSURE_VAL = "~Degasser.Pressure";
         public const string DEGASSER_PRESSURE_OFFSET_VAL = "~Degasser.Pressure.Offset";
+        public const string DEGASSER_TESTDETAILS = "DegasserTestDetails";
+
     }
 }
