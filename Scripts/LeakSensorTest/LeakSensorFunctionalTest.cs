@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
 using UniversalBoardTestApp;
-using System.Windows.Forms;
+
 public class Test
 {
     // Version of the script. Gets displayed in database/protocol
@@ -77,7 +77,7 @@ public class Test
             return Fail("User cancelled: did not apply water.");
 
         // Allow stabilization
-        Thread.Sleep(LeakSensorParameters.ReactionTime_AfterApplyingWater);
+       // Thread.Sleep(LeakSensorParameters.ReactionTime_AfterApplyingWater);
 
         // 4. Now confirm that water was actually applied
         if (!WaitForLeakAlarm(out string waterReply))
@@ -131,7 +131,6 @@ public class Test
         }
         return 0;
     }
-
     private bool WaitForResponse(string parameterName, int timeoutMs, out string response)
     {
         int elapsed = 0;
@@ -246,7 +245,6 @@ public class Test
         return false;
     }
 
-
     // Detect when leak becomes 0 
     private bool WaitForLeakToClear()
     {
@@ -271,7 +269,6 @@ public class Test
         }
         return false;
     }
-
 }
 
 public static class TopMostMessageBox
