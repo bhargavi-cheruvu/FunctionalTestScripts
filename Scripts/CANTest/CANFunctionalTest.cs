@@ -1,15 +1,16 @@
-﻿using LogViewManager;
+﻿using Helper;
+using LogViewManager;
 using System;
+using System.Net.Security;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UniversalBoardTestApp;
-using Helper;
+using UniversalBoardTestApp.XmlModels;
 public class Test
 {
     // Version of the script. Gets displayed in database/protocol
     private const string TestVersion = Handler.TEST_VERSION; // Version Number
-    private byte LEFTNODE = 0x11;
-    private byte RIGHTNODE = 0x12;
-    
+   
     public bool Start()
     {
         try
@@ -134,10 +135,9 @@ public class Test
     private bool SendSdoSB(int nodeId, ushort index, byte subIndex, byte Val)
     {
         HardwareParameters.SetParameter("CanE0.SdoSB", nodeId);
-        Logger.LogMessage(Level.Info, $"SDO WriteByte to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X2}");
+               Logger.LogMessage(Level.Info, $"SDO WriteByte to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X2}");
         return true;
     }
-
 
     private void Wait(double seconds)
     {

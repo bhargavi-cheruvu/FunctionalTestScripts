@@ -13,6 +13,8 @@ namespace Helper
         public const string TEST_VERSION = "0.0.0.1";
         public const string BackupMemoryTest = "Starting Backup Memory Test Script.";
         public const string BackupStatusResponse = "0,0,1";
+        public const string BACKUPMEMORY_TESTDETAIL = "BackupMemoryTestDetail";
+        public const string BACKUP_TESTTABLE = "BackupMemoryTestTable";
         public const char DELIMITER = '=';
         public const string REQUEST = "?";
         public const string BACKUPMEMORY_COMMAND= "BackupMemory.Status";

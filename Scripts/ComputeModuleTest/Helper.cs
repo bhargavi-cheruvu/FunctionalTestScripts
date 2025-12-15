@@ -25,5 +25,7 @@ namespace Helper
         public const string TestDCF_MissingTestAdapter = "Improper or missing test adapter or CPU board alignment failure. Code 4254.";
         public const string TESTDCFAlignment_INVALID_RESPONSE = "Invalid Response";
         public const int ComputeModule_WaitTime = 1000;
-    }    
+        public const string COMPUTEMODULE_TESTDETAIL = "ComputeModuleTestDetail";
+        public const string TestDCFAlignment_ERRORSTATUS = "~TestDCFAlignment";
+    }
 }

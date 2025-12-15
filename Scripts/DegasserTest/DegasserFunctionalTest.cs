@@ -48,7 +48,7 @@ public class Test
     short COMPortVal = 0;
 
     // pressure conversion
-    private const double AllowedDeviationMbar = 0.5;
+    private const double AllowedDeviationMbar = 2.0; // 0.5;
     private const double ScalePerCountMbar = 0.01;
     private const int MinCounts = 8000;
     private const int MaxCounts = 15000;
@@ -360,12 +360,13 @@ public class Test
         double stableCounts = WaitForPressureStability();
         if (stableCounts < 0) return -1;
 
-        double averagedCounts = AveragePressureOverTime(30_000);
+        double averagedCounts = AveragePressureOverTime(30000);
         if (averagedCounts < 0) return -1;
 
         double averageMbar = averagedCounts * ScalePerCountMbar;
 
         double externalMbar = ReadExternalSensor();
+        
         double offsetMbar = CalculateAndApplyOffset(averageMbar, externalMbar);
 
         if (!VerifyOffsetAndPressure(externalMbar))

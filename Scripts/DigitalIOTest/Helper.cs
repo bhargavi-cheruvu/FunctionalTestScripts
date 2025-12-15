@@ -86,6 +86,8 @@ namespace Helper
         public const int TOKEN_LENGTH = 2;       
 
         public const string TEST_VERSION = "0.0.0.1"; // Version Number
+
+        public const string DIGI_TESTDETAIL = "DigitalIOTestDetail";
     }
 
     public class RequestToDevice
