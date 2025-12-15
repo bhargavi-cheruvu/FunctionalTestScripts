@@ -53,7 +53,7 @@ public class Parser
             // Leak Sensor
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibrate, DeviceType = "USB", ConversionFormula = "NotNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.LeakSensorCalibOffset, DeviceType = "USB", ConversionFormula = "IsNeeded" });
-            Add(new HardwareParameter() { Name = BoardParameterName.MuteAlarm, DeviceType = "USB", ConversionFormula = "None" });
+            Add(new HardwareParameter() { Name = BoardParameterName.MuteAlarm, DeviceType = "USB", ConversionFormula = "NotNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.LeakCMD, DeviceType = "USB", ConversionFormula = "None" });
 
             // Compute Module
