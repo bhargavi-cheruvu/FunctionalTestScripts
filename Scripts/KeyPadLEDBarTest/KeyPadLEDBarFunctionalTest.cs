@@ -1,15 +1,16 @@
 ﻿using Helper;
+using KeyPadLEDBarTest;
 using LogViewManager;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Windows.Forms;
 using UniversalBoardTestApp;
-using KeyPadLEDBarTest;
 
 public class Test
 {
@@ -18,7 +19,6 @@ public class Test
     private int result = 1;
     private bool IsLEDBarMode = true;
     private string responseVal = null;
-    //private string[] buttons = new string[] { "Yes", "No" };
     private CustomMessageBox customMessageBox = null;
 
     public bool Start()
@@ -27,28 +27,32 @@ public class Test
             return false;
 
         Logger.LogMessage(Level.Info, Handler.LEDBarTest);
-        SetLEDBarForeColor();
-
-        if (SwitchToServiceLevel())
+        if (SetLEDBarForeColor())
         {
-            if (KeyPadFunctionality())
+            if (SwitchToServiceLevel())
+            {
+                if (KeyPadFunctionality())
+                {
+                    SwitchToUserLevel();
+                    return true;
+                }
+                return false;
+            }
+            else
             {
                 SwitchToUserLevel();
-                return true;
+                return false;
             }
-            return false;          
         }
-        else
-        {
-            SwitchToUserLevel();
-            return false;
-        }
+        else { return false; }
     }
-    private void SetLEDBarForeColor()
+
+    private bool SetLEDBarForeColor()
     {
         LEDSTATUSCOLOR ledStatusColor = new LEDSTATUSCOLOR();
         string response = UpdateLEDValue();
-        //extract LEDBar color from the response.
+
+        // Extract LEDBar color
         var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (string line in lines)
@@ -56,7 +60,6 @@ public class Test
             var token = line.Split(Handler.DELIMITER);
             if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == Handler.LEDBAR_RESP_CMD)
             {
-                string key = token[Handler.INDEX_ZERO];
                 response = token[Handler.INDEX_ONE];
                 Logger.LogMessage(Level.Info, $"Response for LEDBar.ForceColor is {token[Handler.INDEX_ONE]}");
                 break;
@@ -67,44 +70,60 @@ public class Test
         {
             result = int.Parse(response);
             ledStatusColor = (LEDSTATUSCOLOR)result;
-
-            switch (ledStatusColor)
-            {
-                case LEDSTATUSCOLOR.RED:
-                case LEDSTATUSCOLOR.GREEN:
-                case LEDSTATUSCOLOR.BLUE:
-                case LEDSTATUSCOLOR.YELLOW:            
-                    break;
-                case LEDSTATUSCOLOR.OFF:                                          
-                    break;
-                
-                default: break;
-            }
         }
 
+        // If LEDBar mode is not active, fail
+        if (!IsLEDBarMode)
+            return false;
+
+        // Use result as index i
+        int i = result;
+
+        // Ask the confirmation question
+        bool confirmed = HandleLEDBarMode(ref result, ref IsLEDBarMode, ledStatusColor.ToString());
+
+        if (!confirmed)
+            return false;   // user selected "No"
+
+        // If still in LED mode, continue with next step
         if (IsLEDBarMode)
+            return SetLEDBarForeColor();   // recursion allowed because result increments
+
+        return true; // finished LED cycle successfully
+    }
+
+    private bool HandleLEDBarMode(ref int result, ref bool IsLEDBarMode, string ledStatusColor)
+    {
+        if (!IsLEDBarMode)
+            return false;
+
+        string msg;
+
+        bool requiresStatusCheck = (result == 1 || result == 2 || result == 5);
+
+        if (requiresStatusCheck)
         {
-            string msg = string.Empty;
-            if (result == 1 || result == 2 || result == 5) // RED, GREEN, OFF
-            {
-                msg = $"Complete LEDBar is {ledStatusColor} and the STATUS LED lights are {ledStatusColor} ? \n Please Confirm.";
-            }
-            else
-            {
-                msg = $"Complete LEDBar is set to {ledStatusColor} ? ";
-            }
-            if (MessageBox.Show(msg, Handler.LED_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
-            {
-                result++;
-                if (result > 5) //reset to 0
-                {
-                    result = 0;
-                    IsLEDBarMode = false;
-                }
-                if (IsLEDBarMode) { SetLEDBarForeColor(); }
-            }
+            msg = $"Complete LEDBar is {ledStatusColor} and the STATUS LED lights are {ledStatusColor} ? \nPlease Confirm.";
         }
-        else return;
+        else
+        {
+            msg = $"Complete LEDBar is set to {ledStatusColor} ? ";
+        }
+
+        if (MessageBox.Show(msg, Handler.LED_CAPTION, MessageBoxButtons.YesNo) == DialogResult.Yes)
+        {
+            result++;
+
+            if (result > 5)
+            {
+                result = 0;
+                IsLEDBarMode = false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public bool SwitchToServiceLevel()
@@ -135,7 +154,6 @@ public class Test
 
         return true;
     }
-
     private bool SwitchToUserLevel()
     {
         string lockState = null;
@@ -167,8 +185,10 @@ public class Test
             }
         }
         return false;
-    }
+    }   
 
+    private List<int> storedKeypadPresses = new List<int>();   // Store key press and release values
+       
     private bool KeyPadFunctionality()
     {
         IsLEDBarMode = false;
@@ -185,8 +205,14 @@ public class Test
         Handler.PRESS_FLOW_BUTTON
         };
 
+        HashSet<int> capturedKeys = new HashSet<int>();
+
+        Logger.LogMessage(Level.Info, "Starting KeyPadFunctionality test...");
+
         for (int i = 0; i < expectedKeys.Length; i++)
         {
+            Thread.Sleep(500); // Safety delay between buttons
+
             CustomMessageBox box = new CustomMessageBox(
                 Handler.KEYPAD_CAPTION,
                 messages[i],
@@ -195,13 +221,106 @@ public class Test
             box.ShowDialog();
 
             if (box.SelectedButton != "Yes")
+            {
+                Logger.LogMessage(Level.Warning,
+                    $"User selected NO for: {messages[i]}. Test FAILED.");
                 return false;
+            }
 
-            // Validate captured hardware key
-            if (box.CapturedKeyValue != expectedKeys[i]) continue;         
+            //----------------------------------------------------
+            // Capture ALL hardware events from the messagebox
+            //----------------------------------------------------
+            var capturedEvents = box.CapturedValues;
+
+            Logger.LogMessage(Level.Info,
+                $"Captured events for '{messages[i]}': {string.Join(",", capturedEvents)}");
+
+            if (capturedEvents.Count == 0)
+            {
+                Logger.LogMessage(Level.Error,
+                    "No hardware key events captured. Test FAILED.");
+                return false;
+            }
+
+            //----------------------------------------------------
+            // PRESS = first non-zero value
+            //----------------------------------------------------
+            int pressedValue = capturedEvents.FirstOrDefault(v => v > 0);
+
+            if (pressedValue <= 0)
+            {
+                Logger.LogMessage(Level.Error,
+                    $"No valid PRESS detected. Expected {expectedKeys[i]}. Test FAILED.");
+                return false;
+            }
+
+            //----------------------------------------------------
+            // RELEASE = last zero value
+            //----------------------------------------------------
+            int releaseValue = capturedEvents.LastOrDefault(v => v == 0);
+
+            if (releaseValue != 0)
+            {
+                Logger.LogMessage(Level.Error,
+                    $"Key RELEASE was {releaseValue}. Expected 0. Test FAILED.");
+                return false;
+            }
+
+            //----------------------------------------------------
+            // Validate PRESS
+            //----------------------------------------------------
+            if (pressedValue != expectedKeys[i])
+            {
+                Logger.LogMessage(Level.Error,
+                    $"Incorrect key press! Expected {expectedKeys[i]} but received {pressedValue}. Test FAILED.");
+                return false;
+            }
+
+            capturedKeys.Add(pressedValue);
+
+            // Store all raw events if needed for later analysis
+            storedKeypadPresses.AddRange(capturedEvents);
+
+            Logger.LogMessage(Level.Info,
+                $"Correct PRESS {pressedValue} and RELEASE 0 detected.");
+        }
+
+        //--------------------------------------------------------
+        // Validate all keys were captured at least once
+        //--------------------------------------------------------
+        bool allKeysCaptured = AllExpectedKeysCaptured(expectedKeys, capturedKeys);
+
+        if (allKeysCaptured)
+        {
+            Logger.LogMessage(Level.Info,
+                "All expected keys captured successfully. KeyPadFunctionality PASSED.");
+        }
+        else
+        {
+            Logger.LogMessage(Level.Error,
+                "NOT all expected keys were captured. KeyPadFunctionality FAILED.");
+        }
+
+        return allKeysCaptured;
+    }
+
+    private bool AllExpectedKeysCaptured(int[] expected, HashSet<int> captured)
+    {
+        foreach (int key in expected)
+        {
+            if (!captured.Contains(key))
+                return false;
         }
         return true;
     }
+
+    private int GetHardwareKeyRelease()
+    {
+        bool value = HardwareParameters.GetParameter(Handler.RESPONSE_KEYPROPERTY, out double val);
+        //// Logger.LogMessage(Level.Info, $"Raw hardware key release value: {value}");
+        return Convert.ToInt32(val);
+    }
+
     private string UpdateLEDValue()
     {
         string response;
