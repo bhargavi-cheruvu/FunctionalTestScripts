@@ -67,6 +67,8 @@ public class Test
         }
 
         Logger.LogMessage(Level.Error, Handler.MISSING_ADAPTER);
+        // Insert the Test details in to the database.
+        new TestDetail(Handler.DIGI_TESTDETAIL, Handler.MISSING_ADAPTER, true);
         return false;
     }
 

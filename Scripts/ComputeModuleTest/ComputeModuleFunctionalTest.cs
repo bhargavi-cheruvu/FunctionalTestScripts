@@ -55,17 +55,21 @@ public class Test
                         {
                             result = resp.Trim();
                             Logger.LogMessage(Level.Info, result);
+                            // Insert the Test details in to the database.
+                            new TestDetail(Handler.COMPUTEMODULE_TESTDETAIL, result, true);
                             return true;
                         }
                     }
 
-                    if (token.Length > Handler.INDEX_ONE && token[Handler.INDEX_ZERO] == "~TestDCFAlignment")
+                    if (token.Length > Handler.INDEX_ONE && token[Handler.INDEX_ZERO] == Handler.TestDCFAlignment_ERRORSTATUS)
                     {
                         resp = token[Handler.INDEX_ONE];
                         if (resp.Contains(Handler.TestDCF_MissingTestAdapter))
                         {
                             result = resp.Trim();
                             Logger.LogMessage(Level.Error, result);
+                            // Insert the Test details in to the database.
+                            new TestDetail(Handler.COMPUTEMODULE_TESTDETAIL, result, true); 
                             return false;
                         }
                     }

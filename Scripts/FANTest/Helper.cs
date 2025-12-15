@@ -22,6 +22,7 @@ namespace Helper
         public const string Nothing = "";
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
+        public const string TABLE_ID = "ID";
     }
     
     public class ServiceLevelParameterNames
@@ -80,5 +81,9 @@ namespace Helper
         public const int WAITTIME = 1000;
         public const int WAITTIME_INMILLISECONDS = 10 * 1000;
         public const int SPEED_MULTIPLE_OFFSET = 15;
+
+        public const string FAN_TESTDETAIL = "FANTestDetail";
+
+
     }
 }

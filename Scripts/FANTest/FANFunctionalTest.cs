@@ -31,6 +31,19 @@ public class Test
         if (SwitchToServiceLevel())
         {
             result = TestFANFunctionality();
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    // Create entry for database/protocol 
+            //    TestTable backuptable = new TestTable(FanParameterNames.FAN_TESTDETAIL, new string[] { Handler.TABLE_ID, FanParameterNames.FAN_TESTDETAIL });
+            //    if (result)
+            //    {
+            //        // Create new Row for BackupTable
+            //        backuptable.AddRow((Handler.TABLE_ID, 1), (FanParameterNames.FAN_TESTDETAIL, result));
+
+            //        if (ScriptHelper.CheckIfProcedureIsCancelled()) { return false; }
+            //        Thread.Sleep(500);
+            //    }
+            //}
         }
 
         SwitchToUserLevel();
@@ -239,6 +252,8 @@ public class Test
                 bool fan2Ok = ValidateSpeedAgainstCase(fan2Speed, c.Min, c.Max, c.Comparison);
                 fan2Passes.Add(fan2Ok);
                 Logger.LogMessage(fan2Ok ? Level.Success : Level.Error, $"PWM case {i + 1} - FAN2 speed={fan2Speed} => {(fan2Ok ? "PASS" : "FAIL")} (expected {RangeDescription(c)})");
+               // new TestDetail(FanParameterNames.FAN_TESTDETAIL, $"PWM case {i + 1} - FAN2 speed={fan2Speed} => {(fan2Ok ? "PASS" : "FAIL")} (expected {RangeDescription(c)})", fan2Ok);
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, fan2Speed, c.Min, c.Max, fan1Ok);
             }
             else
             {
@@ -297,6 +312,8 @@ public class Test
             if (allFan1Passed)
             {
                 Logger.LogMessage(Level.Success, "FAN test PASSED for FAN1 (all three PWM cases).");
+                // Insert the Test details in to the database.
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN test PASSED for FAN1 (all three PWM cases)", true);
                 return true;
             }
             else
@@ -450,6 +467,7 @@ public class Test
                         {
                             FanSpeeds.Add(key, Rep);
                             Logger.LogMessage(Level.Info, $"Response for {key} is {Rep}");
+                            //new TestDetail(FanParameterNames.FAN_TESTDETAIL, Rep, true);
                         }
                         else
                         {
