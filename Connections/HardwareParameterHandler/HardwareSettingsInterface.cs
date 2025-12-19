@@ -44,6 +44,7 @@ public class Parser
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0NmtStart, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0SdoSW, DeviceType = "USB", ConversionFormula = "IsNeeded" });
             Add(new HardwareParameter() { Name = BoardParameterName.CANE0SdoSB, DeviceType = "USB", ConversionFormula = "IsNeeded" });
+            Add(new HardwareParameter() { Name = BoardParameterName.CANDLTxEnabled, DeviceType = "USB", ConversionFormula = "IsNeeded" });
 
             // Degasser            
             Add(new HardwareParameter() { Name = BoardParameterName.Degasser_CMD, DeviceType = "USB", ConversionFormula = "IsNeeded" });
@@ -109,6 +110,7 @@ public class BoardParameterName
     public const string CANE0NmtStart = "CanE0.NmtStart";
     public const string CANE0SdoSW = "CanE0.SdoSW";
     public const string CANE0SdoSB = "CanE0.SdoSB";
+    public const string CANDLTxEnabled = "CanDL.Tx.Enabled";
 
     public const string CANLeftConnector = "0x11"; // need to check
     public const string CANRightConnector = "0x12";

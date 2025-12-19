@@ -15,30 +15,30 @@ public class Test
             return false;
 
         Logger.LogMessage(Level.Info, Handler.USBHubTest);
-        var usbDrivesInfo = GetUSBDrivesInformation();
+        if(ValidateUsbDrives()) return true;
+        else return false;
+    }
 
-        if (usbDrivesInfo.Count == Handler.INDEX_ZERO)
-        {
-            Logger.LogMessage(Level.Info, Handler.NO_USB_DRIVES);
-            return false;
-        }
-        else if (usbDrivesInfo.Count == Handler.INDEX_ONE)
-        {
-            Logger.LogMessage(Level.Info, Handler.ONE_USB_DETECTED);
-            return false;
-        }
-        else if (usbDrivesInfo.Count == Handler.INDEX_TWO)
-        {
-            Logger.LogMessage(Level.Info, Handler.TWO_USB_DETECTED);
-            return false;
-        }
-        else if (usbDrivesInfo.Count == Handler.INDEX_THREE)
-        {
-            Logger.LogMessage(Level.Success, Handler.THREE_USB_DETECTED);
-            return true;
-        }
+    private bool ValidateUsbDrives()
+    {
+        int count = GetUSBDrivesInformation().Count;
 
-        return true;
+        var rules = new Dictionary<int, (Level level, string message, bool result)>
+        {
+            { Handler.INDEX_ZERO,  (Level.Error,    Handler.NO_USB_DRIVES,    false) },
+            { Handler.INDEX_ONE,   (Level.Error,    Handler.ONE_USB_DETECTED, false) },
+            { Handler.INDEX_TWO,   (Level.Error,    Handler.TWO_USB_DETECTED, false) },
+            { Handler.INDEX_THREE, (Level.Success, Handler.THREE_USB_DETECTED, true) }
+        };
+
+        if (!rules.TryGetValue(count, out var rule))
+            return false;
+
+        Logger.LogMessage(rule.level, rule.message);
+        if(count == 3) new TestDetail(Handler.USBHUB_TESTDETAIL, rule.message, true);
+        else new TestDetail(Handler.USBHUB_TESTDETAIL, rule.message, false);
+
+        return rule.result;
     }
 
     public class USBInfo

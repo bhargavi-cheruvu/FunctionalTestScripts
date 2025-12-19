@@ -155,6 +155,7 @@ public class Test
                 if (parsed[key].Equals(expectedValue))
                 {
                     Logger.LogMessage(Level.Info, $"Response from device is {key}: {expectedValue}");
+                   // new TestDetail(Handler.DIGI_TESTDETAIL, expectedValue , true);
                     isValid = true; continue;                    
                 }               
                 else if (!parsed[key].Equals(expectedValue))
@@ -167,9 +168,15 @@ public class Test
         }
 
         if (isValid)
+        {
             Logger.LogMessage(Level.Success, Handler.VALIDATION_SUCCESSFUL);
+            new TestDetail(Handler.DIGI_TESTDETAIL, "Digital I/O Validation Successful", true);
+        }
         else
+        {
             Logger.LogMessage(Level.Error, Handler.VALIDATION_FAILED);
+            new TestDetail(Handler.DIGI_TESTDETAIL, "Digital I/O Validation Failed", false);
+        }
 
         return isValid;
     }

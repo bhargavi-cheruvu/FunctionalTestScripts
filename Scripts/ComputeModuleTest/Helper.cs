@@ -10,7 +10,7 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1"; // Version Number
+        public const string TEST_VERSION = "1.0.0.0"; // Version Number
         public const string ComputeModuleTest = "Starting Compute Module Test Script.";
         public const char NEWLINE = '\n';
         public const char CARRAIGE_RETURN = '\r';

@@ -25,7 +25,6 @@ public class Test
 
         // switch to Service Level.
         Logger.LogMessage(Level.Info, Handler.StartServiceLevelTest);
-
         bool result = false;
 
         if (SwitchToServiceLevel())
@@ -253,11 +252,12 @@ public class Test
                 fan2Passes.Add(fan2Ok);
                 Logger.LogMessage(fan2Ok ? Level.Success : Level.Error, $"PWM case {i + 1} - FAN2 speed={fan2Speed} => {(fan2Ok ? "PASS" : "FAIL")} (expected {RangeDescription(c)})");
                // new TestDetail(FanParameterNames.FAN_TESTDETAIL, $"PWM case {i + 1} - FAN2 speed={fan2Speed} => {(fan2Ok ? "PASS" : "FAIL")} (expected {RangeDescription(c)})", fan2Ok);
-                new TestDetail(FanParameterNames.FAN_TESTDETAIL, fan2Speed, c.Min, c.Max, fan1Ok);
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, fan2Speed, c.Min, c.Max, fan2Ok);
             }
             else
             {
                 // If fan2 doesn't exist, record true so the "all cases pass" for fan2 does not block final result
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, fan2Speed, c.Min, c.Max, fan1Ok);
                 fan2Passes.Add(false);
             }
 
@@ -272,38 +272,39 @@ public class Test
 
         // Final evaluation
         bool allFan1Passed = fan1Passes.TrueForAll(x => x);
-        bool allFan2Passed = fan2Passes.TrueForAll(x => x);
+        bool allFan2Passed = fan2Passes.TrueForAll(x => x);        
 
-        
-
-        /////////////////////////////////////
         if (!allFan1Passed && !allFan2Passed)
         {
             Logger.LogMessage(Level.Error, "FAN1 & FAN2 are not connected or FAN test FAILED for FAN1 & FAN2.");
+            new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN1 & FAN2 are not connected or FAN test FAILED for FAN1 & FAN2.", false);
             return false;
         }
         else if (!allFan1Passed)
         {
             Logger.LogMessage(Level.Error, "FAN1 not connected or FAN test FAILED for FAN1.");
+            new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN1 not connected or FAN test FAILED for FAN1.", false);
             return false;
         }
         else if (!allFan2Passed)
         {
             Logger.LogMessage(Level.Error, "FAN2 not connected or FAN test FAILED for FAN2.");
+            new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN2 not connected or FAN test FAILED for FAN2.", false);
             return false;
         }
-        /////////////////////////////////////
-
+       
         if (IsSecondFANExists)
         {
             if (allFan1Passed && allFan2Passed)
             {
                 Logger.LogMessage(Level.Success, "FAN test PASSED for both FAN1 and FAN2 (all three PWM cases).");
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN test PASSED for both FAN1 and FAN2 (all three PWM cases).", true);
                 return true;
             }            
             else
             {
-                //Logger.LogMessage(Level.Error, "FAN test FAILED. Not all PWM cases passed for both fans.");
+                Logger.LogMessage(Level.Error, "FAN test FAILED. Not all PWM cases passed for both fans.");
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN test FAILED. Not all PWM cases passed for both fans.", false);
                 return false;
             }
         }
@@ -319,6 +320,7 @@ public class Test
             else
             {
                 Logger.LogMessage(Level.Error, "FAN test FAILED for FAN1.");
+                new TestDetail(FanParameterNames.FAN_TESTDETAIL, "FAN test FAILED for FAN1.", false);
                 return false;
             }
         }
