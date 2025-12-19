@@ -37,11 +37,11 @@
 			<Test Name="Compute Module Alignment Test" Script="ComputeModuleTest.dll"/>
 			<Test Name="FAN Test" Script="FANTest.dll"/>
 			<Test Name="USB Hub Test" Script="USBHubTest.dll"/>
-			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
-			<!--<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>-->
+			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>			
 			<Test Name="Degasser Test" Script="DegasserTest.dll"/>			
 			<Test Name="Backup Memory Test" Script="BackupMemoryTest.dll"/>
-			<Test Name="Leak Sensor Test" Script="LeakSensorTest.dll"/>	
+			<Test Name="Leak Sensor Test" Script="LeakSensorTest.dll"/>
+			<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
 		</Tests>
 		<!-- DebugParameters Node: Lists DebugParameter which are supposed to be controllable via Debug Tab Page, Sub Node: DebugParameter -->
 		<DebugParameters>
