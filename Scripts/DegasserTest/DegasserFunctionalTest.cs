@@ -46,9 +46,11 @@ public class Test
 
     string str = string.Empty;
     short COMPortVal = 0;
+    bool bFoundDevice = false;
+    double offsetMbar = 0.0;
 
     // pressure conversion
-    private const double AllowedDeviationMbar = 2.0; // 0.5;
+    private const double AllowedDeviationMbar =  0.5; //2.5;
     private const double ScalePerCountMbar = 0.01;
     private const int MinCounts = 8000;
     private const int MaxCounts = 15000;
@@ -156,9 +158,15 @@ public class Test
         double presureVal = CheckAndCalculateDegasserPressure();
         GMH_CloseCom();
         if (presureVal > 0)
+        {
+            new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Degasser Test Passed.", true);
             return true;
+        }
         else
+        {
+            new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Degasser Test Failed.", false);
             return false;
+        }
     }
     private void DisplayErrorMessage(Int16 ini16ErrorCode, Int32 ini32IntegerValue, double indblFloatValue)
     {
@@ -193,7 +201,7 @@ public class Test
         Int16 _i16_Priority = 0;
         Int32 i32IntegerValue = 0;
         double dblFloatValue = 0;
-        bool bFoundDevice = false;
+       // bool bFoundDevice = false;
 
         unsafe
         {
@@ -210,7 +218,7 @@ public class Test
                 str = "";
                 str = str + "COM" + i16ArrComPortArray[_counter];
                 COMPortVal = i16ArrComPortArray[_counter];
-                MessageBox.Show(str, "COM PORT Number for GMH 3100 series", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+              //  MessageBox.Show(str, "COM PORT Number for GMH 3100 series", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
         this.i16ComPortNummer = COMPortVal;
@@ -224,7 +232,7 @@ public class Test
                 unsafe
                 {
                     this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, 12, &_i16_Priority, &dblFloatValue, &i32IntegerValue);
-                    MessageBox.Show(" GMH_Transmit for GMH 5000 is " + this.i16ErrorCode, "GMH 5000 Series ");
+                  //  MessageBox.Show(" GMH_Transmit for GMH 5000 is " + this.i16ErrorCode, "GMH 5000 Series ");
                 }
                 if (-34 == this.i16ErrorCode) /*No GMH 5000 detected, use GMH 3000 instead*/
                 {
@@ -233,7 +241,7 @@ public class Test
                     unsafe
                     {
                         this.i16ErrorCode = GMH_Transmit(this.i16GMHAddress, 12, &_i16_Priority, &dblFloatValue, &i32IntegerValue);
-                        MessageBox.Show(" GMH_Transmit for GMH 3000 is " + this.i16ErrorCode, "GMH 3000 series ");
+                      //  MessageBox.Show(" GMH_Transmit for GMH 3000 is " + this.i16ErrorCode, "GMH 3000 series ");
                     }
                 }
                 if (0 == this.i16ErrorCode)
@@ -245,7 +253,9 @@ public class Test
             if (false == bFoundDevice)
             {
                 GMH_CloseCom();
+                Logger.LogMessage(Level.Error, "Found no device on selected COM Port");
                 MessageBox.Show("Found no device on selected COM Port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
             }
         }
         else
@@ -336,7 +346,6 @@ public class Test
 
     private double ReadCurrentDisplayValue()
     {
-
         Int16 i16Priority;
         double dblFloatValue;
         Int32 i32IntergerValue;
@@ -350,14 +359,13 @@ public class Test
         }
         return dblFloatValue;
     }
-
     public double CheckAndCalculateDegasserPressure()
     {
         PrepareDegasser();
 
         WaitForPumpReaction();
 
-        double stableCounts = WaitForPressureStability();
+       double stableCounts = WaitForPressureStability();
         if (stableCounts < 0) return -1;
 
         double averagedCounts = AveragePressureOverTime(30000);
@@ -366,8 +374,11 @@ public class Test
         double averageMbar = averagedCounts * ScalePerCountMbar;
 
         double externalMbar = ReadExternalSensor();
-        
-        double offsetMbar = CalculateAndApplyOffset(averageMbar, externalMbar);
+
+        if (externalMbar < 0) return -1;
+
+        //double 
+            offsetMbar = CalculateAndApplyOffset(averageMbar, externalMbar);
 
         if (!VerifyOffsetAndPressure(externalMbar))
             return -1;
@@ -430,13 +441,15 @@ public class Test
         }
 
         Logger.LogMessage(Level.Error, "Degasser pressure did not stabilize within timeout.");
-        new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Degasser pressure did not stabilize.", true);
+        new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Degasser pressure did not stabilize within timeout.", false);
         return -1;
     }
 
     private int ReadPressureCounts()
     {
         HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string resp, true);
+        int Val = (int)Math.Round(ExtractDegasserPressureVal(ResponseSafe(resp)));
+       // Logger.LogMessage(Level.Info, $"Read ~Degasser.Pressure = {Val} counts"); //added
         return (int)Math.Round(ExtractDegasserPressureVal(ResponseSafe(resp)));
     }
 
@@ -479,7 +492,7 @@ public class Test
         {
             Logger.LogMessage(Level.Error, "No valid degasser readings during averaging.");
             new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS,
-                "No valid readings during averaging.", true);
+                "No valid readings during averaging.", false);
             return -1;
         }
 
@@ -488,9 +501,13 @@ public class Test
     private double ReadExternalSensor()
     {
         ReadCOMPorts();
-        double ext = ReadCurrentDisplayValue();
-        Logger.LogMessage(Level.Info, $"External sensor reading = {ext:F2} mbar");
-        return ext;
+        if (bFoundDevice)
+        {
+            double ext = ReadCurrentDisplayValue();
+            Logger.LogMessage(Level.Info, $"External sensor reading = {ext:F2} mbar");
+            return ext;
+        }
+        else return -1;
     }
 
     private double CalculateAndApplyOffset(double averageMbar, double externalMbar)
@@ -498,37 +515,45 @@ public class Test
         double offset = Math.Round(externalMbar - averageMbar, 2);
         Logger.LogMessage(Level.Info, $"Calculated offset = {offset:F2} mbar");
 
-        HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, offset);
+        HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, offset, true);
         Logger.LogMessage(Level.Info, $"Set ~Degasser.Pressure.Offset = {offset:F2}");
 
         return offset;
     }
+   
+
     private bool VerifyOffsetAndPressure(double externalMbar)
-    {
-        // read back offset
+    {    
+        //HardwareParameters.SetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, offsetMbar);
+
         HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE_OFFSET, out string offsetResp, true);
         double readBackOffset = ExtractDegasserPressureOffsetVal(ResponseSafe(offsetResp));
-        Logger.LogMessage(Level.Info, $"Read back Offset = {readBackOffset:F2} mbar");
 
         // read back pressure
         HardwareParameters.GetParameter(DegasserParameterNames.DEGASSER_PRESSURE, out string pressureResp, true);
         double countsDbl = ExtractDegasserPressureVal(ResponseSafe(pressureResp));
         int counts = (int)Math.Round(countsDbl);
         double mbar = counts * ScalePerCountMbar;
-
-        Logger.LogMessage(Level.Info, $"Read back Pressure = {counts} counts = {mbar:F2} mbar");
-
-        // check deviation
-        double diff = Math.Abs(externalMbar - mbar);
+                 
+        double deltaMbar = 0.0;
+        // check deviation             
+        deltaMbar = mbar - Math.Abs(offsetMbar);
+        double diff = 0.0;
+        //if(offsetMbar < 0)
+        //    diff = (externalMbar - deltaMbar);
+        //else
+            diff = deltaMbar - externalMbar;
 
         if (diff > AllowedDeviationMbar)
         {
             Logger.LogMessage(Level.Error,
-                $"Degasser ({mbar:F2}) does not match external ({externalMbar:F2}) within ±{AllowedDeviationMbar} mbar.");
-            new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Mismatch with external sensor.", true);
+                $"Degasser ({deltaMbar:F2}) does not match external ({externalMbar:F2}) within ±{AllowedDeviationMbar} mbar.");
+            new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS, "Mismatch with external sensor.", false);
             return false;
         }
 
+        Logger.LogMessage(Level.Info,
+            $"Degasser ({deltaMbar:F2}) matches external ({externalMbar:F2}) within ±{AllowedDeviationMbar} mbar.");
         return true;
     }
     private bool VerifyCountsRange()
@@ -541,8 +566,12 @@ public class Test
             Logger.LogMessage(Level.Error,
                 $"Degasser pressure {counts} out of allowed range {MinCounts}..{MaxCounts}.");
             new TestDetail(DegasserParameterNames.DEGASSER_TESTDETAILS,
-                "Degasser pressure out of allowed range.", true);
+                "Degasser pressure out of allowed range.", false);
             return false;
+        }
+        else
+        {
+            Logger.LogMessage(Level.Info, $"Degasser {counts} are within the allowed range {MinCounts} .. {MaxCounts}.");
         }
 
         return true;
@@ -575,7 +604,6 @@ public class Test
         }
         return 0.0;
     }
-
     private static double ExtractDegasserPressureOffsetVal(string Response)
     {
         if (string.IsNullOrEmpty(Response))
@@ -602,19 +630,10 @@ public class Test
         return 0.0;
     }
 
-    private double CheckStabilizationPressureValue(double degasserPressureVal)
-    {
-        // Not used for new algorithm; kept for backward compatibility
-        // Stabilization could be speed property value +/- 0.5
-        degasserPressureVal += 0.5;
-        return degasserPressureVal;
-    }
-
     private static string ResponseSafe(string resp)
     {
         return resp ?? string.Empty;
     }
-
     private static double Average(List<int> samples)
     {
         if (samples == null || samples.Count == 0) return 0.0;

@@ -1,166 +1,214 @@
 ﻿using Helper;
 using LogViewManager;
 using System;
-using System.Net.Security;
-using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Threading;
 using UniversalBoardTestApp;
 using UniversalBoardTestApp.XmlModels;
+
 public class Test
 {
-    // Version of the script. Gets displayed in database/protocol
-    private const string TestVersion = Handler.TEST_VERSION; // Version Number
-   
+    private const string TestVersion = Handler.TEST_VERSION;
+    private const int PollIntervalMs = 100;
+
     public bool Start()
     {
         try
         {
-            if (ScriptHelper.CheckIfProcedureIsCancelled())
-                return false;
+            if (ScriptHelper.CheckIfProcedureIsCancelled()) return false;
 
-            //check Left CAN connector.
-            if (!TestLeftCANConnectorNode())
-            {
-                Logger.LogMessage(Level.Error, CANNodeParameters.LEFTCAN_CONNECTOR_FAILED);
-                return false;
-            }
-            else
-            {
-                Logger.LogMessage(Level.Info, CANNodeParameters.LEFTCAN_CONNECTOR_PASSED);
-            }
+            Logger.LogMessage(Level.Info, "Starting CAN Functional Test...");
 
-            if (!TestRightCANConnectorNode())
+            // Test Left CAN Connector
+            if (!TestCanNode(0x11, 0x611, "Left CAN"))
             {
-                Logger.LogMessage(Level.Error, CANNodeParameters.RIGHTCAN_CONNECTOR_FAILED);
+                Fail("Left CAN Connector Test Failed", CANNodeParameters.LEFTCAN_CONNECTOR_FAILED);
                 return false;
             }
-            else
-            {
-                Logger.LogMessage(Level.Info, CANNodeParameters.RIGHTCAN_CONNECTOR_PASSED);
-            }
+            Pass("Left CAN Connector Test Passed", CANNodeParameters.LEFTCAN_CONNECTOR_PASSED);
 
-            Logger.LogMessage(Level.Passed, CANNodeParameters.CAN_TEST_COMPLETED);           
+            // Test Right CAN Connector
+            if (!TestCanNode(0x12, 0x612, "Right CAN"))
+            {
+                Fail("Right CAN Connector Test Failed", CANNodeParameters.RIGHTCAN_CONNECTOR_FAILED);
+                return false;
+            }
+            Pass("Right CAN Connector Test Passed", CANNodeParameters.RIGHTCAN_CONNECTOR_PASSED);
+
+            Pass("CAN Connector Test Completed Successfully", CANNodeParameters.CAN_TEST_COMPLETED);
             return true;
         }
         catch (Exception ex)
         {
-            Logger.LogMessage(Level.Error, ex.ToString());            
+            Logger.LogMessage(Level.Error, ex.ToString());
             return false;
-        }       
+        }
     }
 
-    public bool TestLeftCANConnectorNode()
+    private bool TestCanNode(byte nodeId, int sdoNodeId, string nodeName)
     {
-        SendNmtStop(0x11);
-        Wait(CANNodeParameters.WaitTimeinSeconds);
+        Logger.LogMessage(Level.Info, $"Starting {nodeName} test...");
 
-        SendNmtStart(0x11);
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
-
-        if (!SendSdoSW(0x611, 0x2014, 0x01, 0x0c00)) return false;
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
-
-        if (!SendSdoSB(0x611, 0x2011, 0x01, 0xFF)) return false;
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
-
-        Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);       
-        if (!SendSdoSB(0x611, 0x6200, 0x01, 0x01)) return false;
-
-        if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
-
-        Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
-        SendNmtStop(0x11);
-        Wait(CANNodeParameters.WaitTimeinSeconds);
-
-        SendNmtStop(0x11);
-        Wait(CANNodeParameters.WaitTimeinSeconds);
-
-        if (!OnDeviceReebootGoto()) return false;
-
-        Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
-        if (!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
-
-        return true;
-    }
-
-    public bool TestRightCANConnectorNode()
-    {
-        SendNmtStop(0x12);
-        Wait(CANNodeParameters.WaitTimeinSeconds);
-
-        SendNmtStart(0x12);
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
-
-        if (!SendSdoSW(0x612, 0x2014, 0x01, 0x0c00)) return false;
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
-
-        if (!SendSdoSB(0x612, 0x2011, 0x01, 0xFF)) return false;
-        if (!WaitReady(CANNodeParameters.WaitReadyinSeconds)) return false;
+        if (!SendNmtStop(nodeId, nodeName)) return false;
+        if (!SendNmtStart(nodeId, nodeName)) return false;
+        if (!SendSdoSW(sdoNodeId, 0x2014, 0x01, 0x0C00, nodeName)) return false;
+        if (!SendSdoSB(sdoNodeId, 0x2011, 0x01, 0xFF, nodeName)) return false;
 
         Logger.LogMessage(Level.Warning, CANNodeParameters.POWER_DOWN);
-        if (!SendSdoSB(0x612, 0x6200, 0x01, 0x01)) return false;
+        // Step 5: Increase timeout to 60 seconds for disconnect scenario
+        if (!SendSdoSB(sdoNodeId, 0x6200, 0x01, 0x01, nodeName, 30)) return false;
 
-        if (!WaitReconnect(CANNodeParameters.WaitForReconnectinSeconds)) return false;
+        // Wait for USB reconnect after step 5
+        if (!WaitReconnect(30)) return false;
 
-        Logger.LogMessage(Level.Info, CANNodeParameters.CONNECTION_REESTABLISHED);
-        SendNmtStop(0x12);
-        Wait(CANNodeParameters.WaitTimeinSeconds);
-
-        if (!OnDeviceReebootGoto()) return false;
-
-        Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_BOOTPROCESS);
-        if (!WaitReady(CANNodeParameters.WaitForReconnectinSeconds)) return false;
-
-        return true;
+        return SendNmtStop(nodeId, nodeName);
     }
 
-    private void SendNmtStop(byte nodeId)
+    private bool SendNmtStop(byte nodeId, string stepName)
     {
-        HardwareParameters.SetParameter(CANNodeParameters.LeftCAN_CMD_NMTSTOP, nodeId);
-        Logger.LogMessage(Level.Info, $"NMT Start sent to Node {nodeId:X2}");
+        Logger.LogMessage(Level.Info, $"Sending NMT Stop to Node {nodeId:X2}");
+        HardwareParameters.SetParameter("CanE0.NmtStop", nodeId);
+        return WaitForResult("CanE0.NmtStop", stepName, 5);
     }
 
-    private void SendNmtStart(byte nodeId)
+    private bool SendNmtStart(byte nodeId, string stepName)
     {
-        HardwareParameters.SetParameter(CANNodeParameters.LeftCAN_CMD_NMTSTART, nodeId);
-        Logger.LogMessage(Level.Info, $"NMT Start sent to Node {nodeId:X2}");
-    }
-    private bool SendSdoSW(int nodeId, ushort index, byte subIndex, int Val)
-    {
-        HardwareParameters.SetParameter("CanE0.SdoSW", nodeId);
-        Logger.LogMessage(Level.Info, $"SDO WriteWord to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X4}");
-        return true;
+        Logger.LogMessage(Level.Info, $"Sending NMT Start to Node {nodeId:X2}");
+        HardwareParameters.SetParameter("CanE0.NmtStart", nodeId);
+        return WaitForResult("CanE0.NmtStart", stepName, 5);
     }
 
-    private bool SendSdoSB(int nodeId, ushort index, byte subIndex, byte Val)
+    private bool SendSdoSW(int nodeId, ushort index, byte subIndex, int value, string stepName)
     {
-        HardwareParameters.SetParameter("CanE0.SdoSB", nodeId);
-               Logger.LogMessage(Level.Info, $"SDO WriteByte to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {Val:X2}");
-        return true;
+        Logger.LogMessage(Level.Info, $"Sending SDO WriteWord to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {value:X4}");
+        HardwareParameters.SetParameter("CanE0.SdoSW", $"{nodeId},{index},{subIndex},{value}");
+        return WaitForResult("CanE0.SdoSW", stepName, 5);
     }
 
-    private void Wait(double seconds)
+    private bool SendSdoSB(int nodeId, ushort index, byte subIndex, byte value, string stepName, double timeoutSeconds = 5)
     {
-        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds));
+        Logger.LogMessage(Level.Info, $"Sending SDO WriteByte to Node {nodeId:X2}: {index:X4}:{subIndex:X2} = {value:X2}");
+        HardwareParameters.SetParameter("CanE0.SdoSB", $"{nodeId},{index},{subIndex},{value}");
+        return WaitForResult("CanE0.SdoSB", stepName, timeoutSeconds);
     }
 
-    private bool WaitReady(double seconds)
+    private bool WaitForResult(string resultKey, string stepName, double timeoutSeconds = 5)
     {
-        Logger.LogMessage(Level.Info, $"Waiting for device ready for up to {seconds} seconds...");
-        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds)); // Wait Time in milliseconds
-        return true;
-    }
-    private bool WaitReconnect(double seconds)
-    {
-        Logger.LogMessage(Level.Info, $"Waiting for Reconnection (USB loss detection) for up to {seconds} seconds...");
-        Thread.Sleep((int)(seconds * CANNodeParameters.TimeinMilliSeconds)); // Wait Time in milliseconds
-        return true;
+        int timeoutMs = (int)(timeoutSeconds * 1000);
+        int elapsed = 0;
+
+        Logger.LogMessage(Level.Info, $"Polling for {stepName} response (timeout {timeoutSeconds}s)...");
+
+        while (elapsed < timeoutMs)
+        {
+            if (ScriptHelper.CheckIfProcedureIsCancelled()) return false;
+
+            bool success = HardwareParameters.GetParameter(resultKey, out string response, true);
+            if (success)
+            {
+                var lines = response.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in lines)
+                {
+                    var token = line.Split(Handler.DELIMITER);
+                    if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == "CanE0.NmtStop")
+                    {
+                        string key = token[Handler.INDEX_ZERO];
+                        response = token[Handler.INDEX_ONE];
+                        Logger.LogMessage(Level.Info, $"Raw response for {stepName}: {response}");
+                        break;
+                    }
+                    if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == "CanE0.NmtStart")
+                    {
+                        string key = token[Handler.INDEX_ZERO];
+                        response = token[Handler.INDEX_ONE];
+                        Logger.LogMessage(Level.Info, $"Raw response for {stepName}: {response}");
+                        break;
+                    }
+                    if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == "CanE0.SdoSW")
+                    {
+                        string key = token[Handler.INDEX_ZERO];
+                        response = token[Handler.INDEX_ONE];
+                        Logger.LogMessage(Level.Info, $"Raw response for {stepName}: {response}");
+                        break;
+                    }
+                    if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == "CanE0.SdoSB")
+                    {
+                        string key = token[Handler.INDEX_ZERO];
+                        response = token[Handler.INDEX_ONE];
+                        Logger.LogMessage(Level.Info, $"Raw response for {stepName}: {response}");
+                        break;
+                    }
+                }
+                //Logger.LogMessage(Level.Info, $"Raw response for {stepName}: {response}");
+            }
+
+            if (!string.IsNullOrEmpty(response) && response.Contains("OK"))
+            {
+                Logger.LogMessage(Level.Info, $"{stepName} succeeded: OK");
+                return true;
+            }
+
+            Thread.Sleep(PollIntervalMs);
+            elapsed += PollIntervalMs;
+        }
+
+        Logger.LogMessage(Level.Error, $"Timeout waiting for {stepName} to return OK");
+        return false;
     }
 
-    private bool OnDeviceReebootGoto()
+    private bool WaitReconnect(double timeoutSeconds)
     {
-        // check if previous USB disconnection was set or not.
-        Logger.LogMessage(Level.Info, CANNodeParameters.WAIT_FOR_DEVICEREBOOT);
-        return true;
+        Logger.LogMessage(Level.Info, $"Waiting for CAN reconnect (timeout {timeoutSeconds}s)...");
+        int timeoutMs = (int)(timeoutSeconds * 1000);
+        int elapsed = 0;
+
+        while (elapsed < timeoutMs)
+        {
+            bool connected = HardwareParameters.GetParameter("CanDL.Tx.Enabled", out string val, true);
+            var lines = val.Split(new[] { Handler.NEWLINE, Handler.CARRAIGE_RETURN }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                var token = line.Split(Handler.DELIMITER);
+                if (token.Length > Handler.INDEX_ZERO && token[Handler.INDEX_ZERO] == "~CanDL.Tx.Enabled")
+                {
+                    string key = token[Handler.INDEX_ZERO];
+                    val = token[Handler.INDEX_ONE];
+                    Logger.LogMessage(Level.Info, $"Reconnect poll: CanDL.Tx.Enabled = {val}");
+                    break;
+                }
+                //Logger.LogMessage(Level.Info, $"Reconnect poll: CanDL.Tx.Enabled = {val}");
+            }
+
+            if (connected && val.Contains("1"))
+            {
+                Logger.LogMessage(Level.Info, "CAN connection restored");
+                return true;
+            }
+            else
+            {
+                Logger.LogMessage(Level.Error, "CAN Adapter disconnected");
+                return false;
+            }
+
+                Thread.Sleep(PollIntervalMs);
+            elapsed += PollIntervalMs;
+        }
+
+        Logger.LogMessage(Level.Error, "Timeout waiting for CAN reconnect");
+        return false;
+    }
+
+    private void Pass(string msg, string log)
+    {
+        new TestDetail(CANNodeParameters.CAN_TESTDETAIL, msg, true);
+        Logger.LogMessage(Level.Info, log);
+    }
+
+    private void Fail(string msg, string log)
+    {
+        new TestDetail(CANNodeParameters.CAN_TESTDETAIL, msg, false);
+        Logger.LogMessage(Level.Error, log);
     }
 }

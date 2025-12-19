@@ -10,7 +10,7 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1";
+        public const string TEST_VERSION = "1.0.0.0";
         public const string USBHubTest = "USB Hub Test Script.";
         public const string CheckUSBDrives = "Checking for Connected USB Drives...";
         public const string NO_USB_DRIVES = "No USB Drives detected.";
@@ -32,5 +32,6 @@ namespace Helper
         public const string TWO_USB_DETECTED = "Two USB sticks detected.";
         public const string THREE_USB_DETECTED = "Three USB sticks detected.";
         public const string UNKNOWN = "UnKnown";
+        public const string USBHUB_TESTDETAIL = "USBHubTestDetail";
     }    
 }

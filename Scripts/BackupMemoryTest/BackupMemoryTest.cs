@@ -15,10 +15,8 @@ public class Test
             return false;
 
         Logger.LogMessage(Level.Info, Handler.BackupMemoryTest);
-        if (CheckBackupMemoryConnected())                    
-            return true;        
-        else
-            return false;
+        if (CheckBackupMemoryConnected()) return true;        
+        else return false;
     }
 
     private bool CheckBackupMemoryConnected()

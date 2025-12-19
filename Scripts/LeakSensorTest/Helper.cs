@@ -12,7 +12,7 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1"; // Version Number
+        public const string TEST_VERSION = "1.0.0.0"; // Version Number
         public const string StartServiceLevelTest = "Starting Service Level Test Script.";
         public const string SwitchToServiceLevel = "Starting Service Level switch test...";
         public const char NEWLINE = '\n';
@@ -22,7 +22,7 @@ namespace Helper
         public const string Nothing = "";
         public const int INDEX_ZERO = 0;
         public const int INDEX_ONE = 1;
-        public const string REQUEST = "?";
+        public const string REQUEST = "?";  
     }
 
     public class LeakSensorParameters
@@ -37,13 +37,14 @@ namespace Helper
         public const string MUTE_ALARM = "MuteAlarm";
         public const string MUTE_ALARM_RESP = "~MuteAlarm";
         public const string ExpectedResult = "OK";
-        public const int ReactionTime_AfterApplyingWater = 60000;
+        public const int ReactionTime_AfterApplyingWater = 20000;//1000;//60000;
         public const string Dry_LeakSensor = "Leak";
         public const string Dry_LeakSensor_Resp = "~Leak";
         public const string Dry_LeakSensor_ExpectedResp = "0";
         public const int TimeInterval_DryLeakSensor = 30000;
         public const int MinExpectedLeakValue = 300;
         public const string Err_LeakError = "~Err";
+        public const string LEAKSENSOR_TESTDETAIL = "LeakSensorTestDetail";
         public const string LeakErrorResponse = "!generic,1,33,\"Leak detected - eliminate within approx. 180 seconds. Code 33.\",I,180";
         public const string LeakErrorResponse_1 = "!generic,1,33,\"Leak detected - eliminate within approx. 150 seconds. Code 33.\",I,150";
     }

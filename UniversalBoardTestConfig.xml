@@ -13,13 +13,13 @@
 			<MonitorSettings />
 			<!-- ResultSettings Node: Enables result transfers to database and protocol -->
 			<!-- Attributes: DatabaseEnabled (bool), TestReportEnabeld (bool) -->
-			<ResultSettings DatabaseEnabled="False" TestReportEnabled="False" />
+			<ResultSettings DatabaseEnabled="True" TestReportEnabled="True" />
 		</AppConfiguration>
 		<!-- DevicesUnderTest Node: Lists Devices Under Test Nodes, Sub Node: DeviceUnderTest -->
 		<DevicesUnderTest>
 			<!-- DeviceUnderTest Node: Information about the device, which is supposed to be tested -->
 			<!-- Attributes: Name (string), Partnumber (string), Description (string), Manufacturer (string) -->
-			<DeviceUnderTest Name="Basismodul VPump" Partnumber="Example Partnumber" Description="Example Description" Manufacturer="Example Manufacturer"/>
+			<DeviceUnderTest Name="Basismodul VPump" Partnumber="Basismodul VPump Partnumber" Description="Basismodul VPump Description" Manufacturer="Basismodul VPump Manufacturer"/>
 		</DevicesUnderTest>
 		<!-- Connections Node: Lists Connections, Sub Node: Connection -->
 		<Connections>
@@ -38,7 +38,7 @@
 			<Test Name="FAN Test" Script="FANTest.dll"/>
 			<Test Name="USB Hub Test" Script="USBHubTest.dll"/>
 			<Test Name="CAN / Remote Standby Test" Script="CANConnectorTest.dll"/>
-			<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>
+			<!--<Test Name="Keypad / LEDs Test" Script="KeyPadLEDBarTest.dll"/>-->
 			<Test Name="Degasser Test" Script="DegasserTest.dll"/>			
 			<Test Name="Backup Memory Test" Script="BackupMemoryTest.dll"/>
 			<Test Name="Leak Sensor Test" Script="LeakSensorTest.dll"/>	

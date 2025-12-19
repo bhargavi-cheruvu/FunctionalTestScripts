@@ -10,7 +10,7 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1";
+        public const string TEST_VERSION = "1.0.0.0";
         public const string BackupMemoryTest = "Starting Backup Memory Test Script.";
         public const string BackupStatusResponse = "0,0,1";
         public const string BACKUPMEMORY_TESTDETAIL = "BackupMemoryTestDetail";

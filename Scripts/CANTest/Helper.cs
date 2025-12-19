@@ -10,9 +10,15 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1";
+        public const string TEST_VERSION = "1.0.0.0";
         public const string USBHubTest = "USB Hub Test Script.";
         public const string CheckUSBDrives = "Checking for Connected USB Drives...";
+
+        public const char NEWLINE = '\n';
+        public const char CARRAIGE_RETURN = '\r';
+        public const char DELIMITER = '=';
+        public const int INDEX_ZERO = 0;
+        public const int INDEX_ONE = 1;
     }
     public class CANNodeParameters
     {
@@ -31,7 +37,8 @@ namespace Helper
         public const string WAIT_FOR_DEVICEREBOOT = "Checking for device reboot via USB loss marker...";
         public const double WaitTimeinSeconds = 1.0;
         public const double WaitReadyinSeconds = 5.0;
-        public const double WaitForReconnectinSeconds = 60.0;
+        public const double WaitForReconnectinSeconds = 10.0;//60.0;
         public const int TimeinMilliSeconds = 1000;
+        public const string CAN_TESTDETAIL = "CANTestDetail";
     }
 }

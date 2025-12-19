@@ -16,14 +16,9 @@ public class Test
             return false;
 
         Logger.LogMessage(Level.Info, Handler.ComputeModuleTest);
-
-        if (ComputeModuleResponse())
-        {
-            return true;
-        }
-        return false;
-    }
-    
+        if (ComputeModuleResponse()) return true;
+        else return false;
+    }    
     public bool ComputeModuleResponse()
     {
         string result = string.Empty;

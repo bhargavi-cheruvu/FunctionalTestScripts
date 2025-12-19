@@ -85,7 +85,7 @@ namespace Helper
         public const char DELIMITER = '=';
         public const int TOKEN_LENGTH = 2;       
 
-        public const string TEST_VERSION = "0.0.0.1"; // Version Number
+        public const string TEST_VERSION = "1.0.0.0"; // Version Number
 
         public const string DIGI_TESTDETAIL = "DigitalIOTestDetail";
     }

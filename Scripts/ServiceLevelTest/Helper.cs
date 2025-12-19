@@ -10,7 +10,7 @@ namespace Helper
 {
     public class Handler
     {
-        public const string TEST_VERSION = "0.0.0.1"; // Version Number
+        public const string TEST_VERSION = "1.0.0.0"; // Version Number
         public const string StartServiceLevelTest = "Starting Service Level Test Script.";
         public const string SwitchToServiceLevel = "Starting Service Level switch test...";
         public const char NEWLINE = '\n';
